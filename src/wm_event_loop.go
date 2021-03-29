@@ -1,7 +1,5 @@
 package main
 
-import "log"
-
 func (host *WmHost) wm_event_loop_key_press(){
 }
 
@@ -21,7 +19,6 @@ func (host *WmHost) wm_event_loop_button_press(){
 }
 
 func (host *WmHost) wm_event_loop_button_release(){
-	log.Println("release")
 	host.grab_window = XWindowID(XNone)
 }
 

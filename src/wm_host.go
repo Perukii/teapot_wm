@@ -1,6 +1,7 @@
 package main
 
 import "os"
+import "log"
 
 type WmHost struct{
 	display 	*XDisplay
@@ -52,11 +53,29 @@ func (host *WmHost) wm_host_resize_window(window XWindowID, w int, h int){
 	wm_x11_resize_window(host.display, window, w, h)
 }
 
+func (host *WmHost) wm_host_setup_transparent(transparent *WmTransparent,
+														x int, y int, w int, h int,
+														){
+	wm_x11_create_transparent_window(host.display, host.root_window, x, y, w, h, transparent)
+}
+
+func (host *WmHost) wm_host_map_window(window XWindowID){
+	wm_x11_map_window(host.display, window)
+}
 
 func (host *WmHost) wm_host_run(){
+
+	var trans WmTransparent
+	host.wm_host_setup_transparent(&trans, 100, 100, 500, 500)
+	host.wm_host_map_window(trans.window)
+	host.wm_host_raise_window(trans.window)
+	wm_x11_draw_transparent(host.display, trans)
+
 	for{
 		host.event = wm_x11_peek_event(host.display)
 		switch host.event.wm_event_get_type(){
+		case XMapNotify:
+			log.Println("map")
 		case XKeyPress:
 			host.wm_event_loop_key_press()
 		case XButtonPress:
