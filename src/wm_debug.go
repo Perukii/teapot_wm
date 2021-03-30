@@ -19,3 +19,7 @@ func wm_debug_log_file_init(log_file *os.File){
 
 	log.SetOutput(log_file)
 }
+
+func wm_debug_log(txt string){
+	log.Println(txt)
+}

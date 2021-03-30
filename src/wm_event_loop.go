@@ -1,7 +1,5 @@
 package main
 
-//import "log"
-
 func (host *WmHost) wm_event_loop_map_notify(){
 	var xmap XMapEvent
 	xmap = *(*XMapEvent)(host.event.wm_event_get_pointer())
@@ -18,7 +16,6 @@ func (host *WmHost) wm_event_loop_map_notify(){
 	host.wm_host_update_client_focus()
 
 }
-
 
 func (host *WmHost) wm_event_loop_unmap_notify(){
 	var xunmap XUnmapEvent
@@ -45,6 +42,38 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 
 	host.wm_client_withdraw(address, true)
 	host.wm_host_update_client_focus()
+	
+}
+
+func (host *WmHost) wm_event_loop_configure_notify(){
+	var xconfig XConfigureEvent
+	xconfig = *(*XConfigureEvent)(host.event.wm_event_get_pointer())
+	if xconfig.window == XWindowID(XNone) { return }
+
+	address := host.wm_client_search(xconfig.window)
+	if address == 0 { return }
+	
+	clt := host.client[address]
+	if xconfig.window != clt.box.window { return }
+	
+	host.wm_host_resize_surface(clt.box.surface, int(xconfig.width), int(xconfig.height))
+	host.wm_host_draw_transparent(clt.box)
+	host.wm_client_adjust_app_for_box(address)
+	host.wm_client_adjust_mask_for_box(address)
+	
+}
+
+
+func (host *WmHost) wm_event_loop_configure_request(){
+	var xcfgreq XConfigureRequestEvent
+	xcfgreq = *(*XConfigureRequestEvent)(host.event.wm_event_get_pointer())
+	if xcfgreq.window == XWindowID(XNone) { return }
+
+	address := host.wm_client_search(xcfgreq.window)
+	if address == 0 { return }
+	if xcfgreq.window != host.client[address].app { return }
+
+	//log.Println("conf")
 	
 }
 

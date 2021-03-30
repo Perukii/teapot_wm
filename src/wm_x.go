@@ -26,6 +26,8 @@ type (
 	XUnmapEvent = C.XUnmapEvent
 	XMapRequestEvent = C.XMapRequestEvent
 	XDestroyWindowEvent = C.XDestroyWindowEvent
+	XConfigureEvent = C.XConfigureEvent
+	XConfigureRequestEvent = C.XConfigureRequestEvent
 
 	CairoSfc = C.cairo_surface_t
 	CairoCtx = C.cairo_t
@@ -43,6 +45,8 @@ const (
 	XUnmapNotify = int(C.UnmapNotify)
 	XMapRequest = int(C.MapRequest)
 	XDestroyNotify = int(C.DestroyNotify)
+	XConfigureNotify = int(C.ConfigureNotify)
+	XConfigureRequest = int(C.ConfigureRequest)
 
 	XSubstructureNotifyMask = CLong(C.SubstructureNotifyMask)
 	XSubstructureRedirectMask = CLong(C.SubstructureRedirectMask)
@@ -107,6 +111,12 @@ func wm_x11_resize_window(display *XDisplay, window XWindowID, w int, h int){
 	if w < 1 { w = 1 }
 	if h < 1 { h = 1 }
 	C.XResizeWindow(display, window, C.uint(w), C.uint(h))
+}
+
+func wm_x11_resize_surface(surface *CairoSfc, w int, h int){
+	if w < 1 { w = 1 }
+	if h < 1 { h = 1 }
+    C.cairo_xlib_surface_set_size(surface, C.int(w), C.int(h))
 }
 
 func wm_x11_map_window(display *XDisplay, window XWindowID){

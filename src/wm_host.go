@@ -36,12 +36,21 @@ func (host *WmHost) wm_host_move_window(window XWindowID, x int, y int){
 	wm_x11_move_window(host.display, window, x, y)
 }
 
+func (host *WmHost) wm_host_select_input(window XWindowID, mask CLong){
+	wm_x11_select_input(host.display, window, mask)
+}
+
 func (host *WmHost) wm_host_resize_window(window XWindowID, w int, h int){
 	wm_x11_resize_window(host.display, window, w, h)
 }
 
-func (host *WmHost) wm_host_select_input(window XWindowID, mask CLong){
-	wm_x11_select_input(host.display, window, mask)
+func (host *WmHost) wm_host_resize_surface(surface *CairoSfc, w int, h int){
+	wm_x11_resize_surface(surface, w, h)
+}
+
+func (host *WmHost) wm_host_resize_transparent(transparent WmTransparent, w int, h int){
+	wm_x11_resize_window(host.display, transparent.window, w, h)
+	wm_x11_resize_surface(transparent.surface, w, h)
 }
 
 func (host *WmHost) wm_host_setup_transparent(transparent *WmTransparent, parent XWindowID,
@@ -110,6 +119,10 @@ func (host *WmHost) wm_host_run(){
 			host.wm_event_loop_unmap_notify()
 		case XDestroyNotify:
 			host.wm_event_loop_destroy_notify()
+		case XConfigureNotify:
+			host.wm_event_loop_configure_notify()
+		case XConfigureRequest:
+			host.wm_event_loop_configure_request()
 		case XKeyPress:
 			host.wm_event_loop_key_press()
 		case XButtonPress:

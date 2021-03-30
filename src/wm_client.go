@@ -49,7 +49,7 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 								   int(attr.height)+border_width*2)
 	clt.box.drawtype = WM_DRAW_TYPE_BOX
 
-	host.wm_host_select_input(clt.box.window, XSubstructureNotifyMask)
+	host.wm_host_select_input(clt.box.window, XSubstructureNotifyMask | XSubstructureRedirectMask)
 	host.wm_host_map_window(clt.box.window)
 	host.wm_host_raise_window(clt.box.window)
 	host.wm_host_reparent_window(clt.app, clt.box.window, border_width, border_width)
@@ -90,6 +90,24 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	clt := host.client[address]
 	host.wm_host_move_window  (clt.box.window, x, y)
 	host.wm_host_resize_window(clt.box.window, w, h)
+	host.wm_host_draw_transparent(clt.box)
+
 	host.wm_host_move_window  (clt.mask.window, x, y)
 	host.wm_host_resize_window(clt.mask.window, w, h)
+	host.wm_host_draw_transparent(clt.mask)
+}
+
+func (host *WmHost) wm_client_adjust_mask_for_box(address WmClientAddress){
+	clt := host.client[address]
+	attr := host.wm_host_get_window_attributes(clt.box.window)
+	host.wm_host_move_window  (clt.mask.window, int(attr.x), int(attr.y))
+	host.wm_host_resize_transparent(clt.mask, int(attr.width), int(attr.height))
+	host.wm_host_draw_transparent(clt.mask)
+}
+
+func (host *WmHost) wm_client_adjust_app_for_box(address WmClientAddress){
+	clt := host.client[address]
+	attr := host.wm_host_get_window_attributes(clt.box.window)
+	border_width := host.config.client_drawable_range_border_width
+	host.wm_host_resize_window(clt.app, int(attr.width)-border_width*2, int(attr.height)-border_width*2)
 }
