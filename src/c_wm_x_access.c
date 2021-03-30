@@ -9,18 +9,17 @@ void c_wm_x11_set_type_of_event(XEvent* event, int type){
 	event->type = type;
 }
 
-void c_wm_x11_send_event(Display* display, Window window, const char* event_data){
+void c_wm_x11_send_event_destroy(Display* display, Window window){
 	
-	XEvent delete_event;
-	delete_event.xclient.type = ClientMessage;
-	delete_event.xclient.message_type = XInternAtom(display, "WM_PROTOCOLS", True);
-	delete_event.xclient.format = 32;
-	delete_event.xclient.data.l[0] = XInternAtom(display, event_data, True);
-	delete_event.xclient.data.l[1] = CurrentTime;
-	delete_event.xclient.window = window;
+	XEvent event;
+	event.xclient.type = ClientMessage;
+	event.xclient.message_type = XInternAtom(display, "WM_PROTOCOLS", True);
+	event.xclient.format = 32;
+	event.xclient.data.l[0] = XInternAtom(display, "WM_DELETE_WINDOW", True);
+	event.xclient.data.l[1] = CurrentTime;
+	event.xclient.window = window;
 
-	// 除去イベントを送信
-	XSendEvent(display, window, False, NoEventMask, &delete_event);
+	XSendEvent(display, window, False, NoEventMask, &event);
 }
 
 

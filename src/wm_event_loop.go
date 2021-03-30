@@ -31,6 +31,15 @@ func (host *WmHost) wm_event_loop_unmap_notify(){
 	host.wm_host_update_client_focus()
 }
 
+func (host *WmHost) wm_event_loop_map_request(){
+	var xmapreq XMapRequestEvent
+	xmapreq = *(*XMapRequestEvent)(host.event.wm_event_get_pointer())
+	if xmapreq.window == XWindowID(XNone) { return }
+
+	host.wm_host_map_window(xmapreq.window)
+
+}
+
 func (host *WmHost) wm_event_loop_destroy_notify(){
 	var xdestroy XDestroyWindowEvent
 	xdestroy = *(*XDestroyWindowEvent)(host.event.wm_event_get_pointer())
@@ -46,20 +55,24 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 }
 
 func (host *WmHost) wm_event_loop_configure_notify(){
+	
 	var xconfig XConfigureEvent
 	xconfig = *(*XConfigureEvent)(host.event.wm_event_get_pointer())
 	if xconfig.window == XWindowID(XNone) { return }
+
+	if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
 	address := host.wm_client_search(xconfig.window)
 	if address == 0 { return }
 	
 	clt := host.client[address]
 	if xconfig.window != clt.box.window { return }
+
+	host.wm_client_adjust_app_for_box(address)
+	host.wm_client_adjust_mask_for_box(address)
 	
 	host.wm_host_resize_surface(clt.box.surface, int(xconfig.width), int(xconfig.height))
 	host.wm_host_draw_transparent(clt.box)
-	host.wm_client_adjust_app_for_box(address)
-	host.wm_client_adjust_mask_for_box(address)
 	
 }
 
@@ -71,10 +84,25 @@ func (host *WmHost) wm_event_loop_configure_request(){
 
 	address := host.wm_client_search(xcfgreq.window)
 	if address == 0 { return }
-	if xcfgreq.window != host.client[address].app { return }
 
-	//log.Println("conf")
+	clt := host.client[address]
+	if xcfgreq.window != clt.app { return }
+
+	border_width := host.config.client_drawable_range_border_width
+
+	host.wm_client_configure(address,
+							 int(xcfgreq.x)-border_width,
+							 int(xcfgreq.y)-border_width,
+							 int(xcfgreq.width)+border_width*2,
+							 int(xcfgreq.height)+border_width*2)
+/*
+	host.wm_host_move_window(clt.box.window, int(xcfgreq.x)-border_width, int(xcfgreq.y)-border_width)
+	host.wm_host_resize_window(clt.box.window,
+							   int(xcfgreq.width)+border_width*2,
+							   int(xcfgreq.height)+border_width*2)
+*/
 	
+
 }
 
 func (host *WmHost) wm_event_loop_key_press(){

@@ -216,3 +216,7 @@ func wm_x11_query_tree(display *XDisplay, window XWindowID) WmWindowRelation{
 
 	return target
 }
+
+func wm_x11_check_n_of_queued_event(display *XDisplay) int{
+	return int(C.XEventsQueued(display, C.QueuedAlready))
+}

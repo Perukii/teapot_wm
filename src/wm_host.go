@@ -89,6 +89,10 @@ func (host *WmHost) wm_host_query_parent(window XWindowID) XWindowID{
 	return relation.parent
 }
 
+func (host *WmHost) wm_host_check_n_of_queued_event() int{
+	return wm_x11_check_n_of_queued_event(host.display)
+}
+
 func (host *WmHost) wm_host_set_focus_to_client(address WmClientAddress){
 	clt := host.client[address]
 	for i := address; i < len(host.client)-1; i++{
@@ -117,6 +121,8 @@ func (host *WmHost) wm_host_run(){
 			host.wm_event_loop_map_notify()
 		case XUnmapNotify:
 			host.wm_event_loop_unmap_notify()
+		case XMapRequest:
+			host.wm_event_loop_map_request()
 		case XDestroyNotify:
 			host.wm_event_loop_destroy_notify()
 		case XConfigureNotify:

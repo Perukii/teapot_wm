@@ -8,6 +8,7 @@ type WmClient struct{
 	box WmTransparent
 	app XWindowID
 	mask WmTransparent
+	is_configured bool
 }
 
 type WmTransparent struct{
