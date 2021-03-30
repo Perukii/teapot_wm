@@ -7,9 +7,12 @@ package main
 #include <X11/Xutil.h>
 #include <cairo/cairo-xlib.h>
 #include <X11/cursorfont.h>
+#include "./c_wm_draw.h"
 #include "./c_wm_x_access.h"
 */
 import "C"
+
+import "unsafe"
 
 type (
 	XEvent = C.XEvent
@@ -19,9 +22,14 @@ type (
 	XKeyEvent = C.XKeyEvent
 	XButtonEvent = C.XButtonEvent
 	XMotionEvent = C.XMotionEvent
+	XMapEvent = C.XMapEvent
+	XUnmapEvent = C.XUnmapEvent
+	XMapRequestEvent = C.XMapRequestEvent
 
 	CairoSfc = C.cairo_surface_t
 	CairoCtx = C.cairo_t
+
+	CLong = C.long
 )
 
 const (
@@ -31,6 +39,16 @@ const (
 	XButtonRelease = int(C.ButtonRelease)
 	XMotionNotify = int(C.MotionNotify)
 	XMapNotify = int(C.MapNotify)
+	XUnmapNotify = int(C.UnmapNotify)
+	XMapRequest = int(C.MapRequest)
+
+	XSubstructureNotifyMask = CLong(C.SubstructureNotifyMask)
+	XSubstructureRedirectMask = CLong(C.SubstructureRedirectMask)
+	XButtonPressMask = CLong(C.ButtonPressMask)
+	XButtonReleaseMask = CLong(C.ButtonReleaseMask)
+	XPointerMotionMask = CLong(C.PointerMotionMask)
+
+	XCLeftPtr = int(C.XC_left_ptr)
 )
 
 func wm_x11_open_display() *XDisplay{
@@ -45,6 +63,10 @@ func wm_x11_peek_event(display *XDisplay) XEvent{
 	var event XEvent
 	C.XNextEvent(display, &event)
 	return event
+}
+
+func wm_x11_select_input(display *XDisplay, window XWindowID, mask CLong){
+	C.XSelectInput(display, window, mask)
 }
 
 func wm_x11_grab_button(display *XDisplay, window XWindowID){
@@ -85,6 +107,14 @@ func wm_x11_reparent_window(display *XDisplay, window XWindowID, parent XWindowI
 	C.XReparentWindow(display, window, parent ,C.int(x), C.int(y))
 }
 
+func wm_x11_destroy_window(display *XDisplay, window XWindowID){
+	C.XDestroyWindow(display, window)
+}
+
+func wm_x11_destroy_cairo_surface(display *XDisplay, surface *CairoSfc){
+	C.cairo_surface_destroy(surface)
+}
+
 func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 									  x int, y int, w int, h int,
 									  transparent *WmTransparent,
@@ -99,8 +129,6 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
     attr.background_pixel = 0
 	attr.override_redirect = 1
 	
-	
-	
 	transparent.window = C.XCreateWindow(
 		display,
 		parent,
@@ -113,25 +141,9 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 		C.InputOutput,
 		vinfo.visual,
 		C.CWColormap|C.CWBorderPixel|C.CWBackPixel|C.CWOverrideRedirect,
-		//C.CWColormap|C.CWBackPixel|C.CWOverrideRedirect,
 		&attr,
 	)
 	
-	
-/*
-	transparent.window = C.XCreateSimpleWindow(
-		display,
-		parent,
-		C.int(x),
-		C.int(y),
-		C.uint(w),
-		C.uint(h),
-		C.uint(1),
-		C.ulong(0),
-		C.XBlackPixel(display, 0),
-	)
-*/
-
 	transparent.surface = C.cairo_xlib_surface_create(
 		display,
 		transparent.window,
@@ -144,9 +156,36 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 
 func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent){
 
-	transparent.ctx = C.cairo_create(transparent.surface)
-	C.cairo_set_source_rgba(transparent.ctx, C.double(0.5), C.double(0.5), C.double(1), C.double(0.5))
-	C.cairo_paint(transparent.ctx)
-	C.cairo_surface_flush(transparent.surface)
+	surface_w := C.cairo_image_surface_get_width(transparent.surface)
+	surface_h := C.cairo_image_surface_get_height(transparent.surface)
 
+	switch transparent.drawtype{
+	case WM_DRAW_TYPE_BOX:
+		C.c_wm_transparent_draw_type_box(transparent.surface, surface_w, surface_h)
+	}
+
+}
+
+func wm_x11_define_cursor(display *XDisplay, window XWindowID, cursor int){
+    C.XDefineCursor(display, window,
+		C.XCreateFontCursor(display, C.uint(cursor)));
+}
+
+func wm_x11_query_tree(display *XDisplay, window XWindowID) WmWindowRelation{
+	var target WmWindowRelation
+	var children *XWindowID
+	var nc C.uint
+	C.XQueryTree(display, window, &target.root_window, &target.parent, &children, &nc)
+
+	target.children = make([]XWindowID, int(nc), int(nc))
+
+	for i := 0; i < int(nc); i++ {
+		target.children[i] = C.c_wm_x11_query_window_from_array(children, C.int(i))
+	}
+
+	if children != nil {
+		C.XFree(unsafe.Pointer(children))
+	}
+
+	return target
 }

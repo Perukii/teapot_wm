@@ -1,5 +1,37 @@
 package main
 
+func (host *WmHost) wm_event_loop_map_notify(){
+	var xmap XMapEvent
+	xmap = *(*XMapEvent)(host.event.wm_event_get_pointer())
+	if xmap.window == XWindowID(XNone) { return }
+	if xmap.override_redirect == 1 { return }
+
+	address := host.wm_client_allocate_from_host()
+	if address == 0 { return }
+
+	host.wm_client_setup(&host.client[address], xmap.window)
+
+}
+
+
+func (host *WmHost) wm_event_loop_unmap_notify(){
+	var xunmap XUnmapEvent
+	xunmap = *(*XUnmapEvent)(host.event.wm_event_get_pointer())
+	if xunmap.window == XWindowID(XNone) { return }
+	if xunmap.send_event == 0 { return }
+
+	address := host.wm_client_search(xunmap.window)
+	if address == 0 { return }
+
+	clt := host.client[address]
+	attr := host.wm_host_get_window_attributes(clt.box.window)
+	host.wm_host_reparent_window(clt.app, host.wm_host_query_parent(clt.box.window),
+								int(attr.x), int(attr.y))
+
+	host.wm_client_withdraw(address)
+
+}
+
 func (host *WmHost) wm_event_loop_key_press(){
 }
 
@@ -27,7 +59,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	var motion XMotionEvent
 	motion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
 	
-	if motion.subwindow == XWindowID(XNone) { return }
+	//if motion.subwindow == XWindowID(XNone) { return }
 	if host.grab_window == XWindowID(XNone) { return }
 
 	xdiff := int(motion.x_root) - host.grab_root_x
