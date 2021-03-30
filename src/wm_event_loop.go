@@ -1,10 +1,14 @@
 package main
 
+//import "log"
+
 func (host *WmHost) wm_event_loop_map_notify(){
 	var xmap XMapEvent
 	xmap = *(*XMapEvent)(host.event.wm_event_get_pointer())
 	if xmap.window == XWindowID(XNone) { return }
 	if xmap.override_redirect == 1 { return }
+
+	if host.wm_client_search(xmap.window) != 0 { return }
 
 	address := host.wm_client_allocate_from_host()
 	if address == 0 { return }
@@ -19,17 +23,26 @@ func (host *WmHost) wm_event_loop_unmap_notify(){
 	xunmap = *(*XUnmapEvent)(host.event.wm_event_get_pointer())
 	if xunmap.window == XWindowID(XNone) { return }
 	if xunmap.send_event == 0 { return }
-
+	
 	address := host.wm_client_search(xunmap.window)
 	if address == 0 { return }
+	if host.client[address].app != xunmap.window { return }
 
-	clt := host.client[address]
-	attr := host.wm_host_get_window_attributes(clt.box.window)
-	host.wm_host_reparent_window(clt.app, host.wm_host_query_parent(clt.box.window),
-								int(attr.x), int(attr.y))
+	host.wm_client_withdraw(address, false)
+}
 
-	host.wm_client_withdraw(address)
+func (host *WmHost) wm_event_loop_destroy_notify(){
+	var xdestroy XDestroyWindowEvent
+	xdestroy = *(*XDestroyWindowEvent)(host.event.wm_event_get_pointer())
+	if xdestroy.window == XWindowID(XNone) { return }
 
+	address := host.wm_client_search(xdestroy.window)
+	if address == 0 { return }
+
+	if host.client[address].app != xdestroy.window { return }
+
+	host.wm_client_withdraw(address, true)
+	
 }
 
 func (host *WmHost) wm_event_loop_key_press(){

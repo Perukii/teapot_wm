@@ -80,6 +80,8 @@ func (host *WmHost) wm_host_run(){
 			host.wm_event_loop_map_notify()
 		case XUnmapNotify:
 			host.wm_event_loop_unmap_notify()
+		case XDestroyNotify:
+			host.wm_event_loop_destroy_notify()
 		case XKeyPress:
 			host.wm_event_loop_key_press()
 		case XButtonPress:

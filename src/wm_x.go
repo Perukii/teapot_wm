@@ -25,6 +25,7 @@ type (
 	XMapEvent = C.XMapEvent
 	XUnmapEvent = C.XUnmapEvent
 	XMapRequestEvent = C.XMapRequestEvent
+	XDestroyWindowEvent = C.XDestroyWindowEvent
 
 	CairoSfc = C.cairo_surface_t
 	CairoCtx = C.cairo_t
@@ -41,6 +42,7 @@ const (
 	XMapNotify = int(C.MapNotify)
 	XUnmapNotify = int(C.UnmapNotify)
 	XMapRequest = int(C.MapRequest)
+	XDestroyNotify = int(C.DestroyNotify)
 
 	XSubstructureNotifyMask = CLong(C.SubstructureNotifyMask)
 	XSubstructureRedirectMask = CLong(C.SubstructureRedirectMask)
@@ -109,6 +111,7 @@ func wm_x11_reparent_window(display *XDisplay, window XWindowID, parent XWindowI
 
 func wm_x11_destroy_window(display *XDisplay, window XWindowID){
 	C.XDestroyWindow(display, window)
+	//C.c_wm_x11_send_event(display, window, C.CString("WM_DELETE_WINDOW"))
 }
 
 func wm_x11_destroy_cairo_surface(display *XDisplay, surface *CairoSfc){
