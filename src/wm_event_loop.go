@@ -29,6 +29,7 @@ func (host *WmHost) wm_event_loop_unmap_notify(){
 	if host.client[address].app != xunmap.window { return }
 
 	host.wm_client_withdraw(address, false)
+	host.wm_host_update_client_focus()
 }
 
 func (host *WmHost) wm_event_loop_destroy_notify(){
@@ -38,10 +39,10 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 
 	address := host.wm_client_search(xdestroy.window)
 	if address == 0 { return }
-
 	if host.client[address].app != xdestroy.window { return }
 
 	host.wm_client_withdraw(address, true)
+	host.wm_host_update_client_focus()
 	
 }
 
@@ -49,18 +50,26 @@ func (host *WmHost) wm_event_loop_key_press(){
 }
 
 func (host *WmHost) wm_event_loop_button_press(){
-	var button XButtonEvent
-	button = *(*XButtonEvent)(host.event.wm_event_get_pointer())
-	if button.subwindow == XWindowID(XNone) { return }
-	attr := host.wm_host_get_window_attributes(button.subwindow)
-	host.grab_window = button.subwindow
-	host.grab_button = int(button.button)
-	host.grab_root_x = int(button.x_root)
-	host.grab_root_y = int(button.y_root)
+	var xbutton XButtonEvent
+	xbutton = *(*XButtonEvent)(host.event.wm_event_get_pointer())
+	if xbutton.subwindow == XWindowID(XNone) { return }
+
+	address := host.wm_client_search(xbutton.subwindow)
+	if address == 0 { return }
+
+	host.wm_host_set_focus_to_client(address)
+
+	attr := host.wm_host_get_window_attributes(xbutton.subwindow)
+	host.grab_window = xbutton.subwindow
+	host.grab_button = int(xbutton.button)
+	host.grab_root_x = int(xbutton.x_root)
+	host.grab_root_y = int(xbutton.y_root)
 	host.grab_x = int(attr.x)
 	host.grab_y = int(attr.y)
 	host.grab_w = int(attr.width)
 	host.grab_h = int(attr.height)
+
+
 }
 
 func (host *WmHost) wm_event_loop_button_release(){
@@ -72,7 +81,6 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	var motion XMotionEvent
 	motion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
 	
-	//if motion.subwindow == XWindowID(XNone) { return }
 	if host.grab_window == XWindowID(XNone) { return }
 
 	xdiff := int(motion.x_root) - host.grab_root_x

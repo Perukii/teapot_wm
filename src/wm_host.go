@@ -72,6 +72,21 @@ func (host *WmHost) wm_host_query_parent(window XWindowID) XWindowID{
 	return relation.parent
 }
 
+func (host *WmHost) wm_host_set_focus_to_client(address WmClientAddress){
+	clt := host.client[address]
+	for i := address; i < len(host.client)-1; i++{
+		host.client[i] = host.client[i+1]
+	}
+	host.client[len(host.client)-1] = clt
+	host.wm_host_update_client_focus()
+}
+
+func (host *WmHost) wm_host_update_client_focus(){
+	clt := host.client[len(host.client)-1]
+	wm_x11_raise_window(host.display, clt.box.window)
+	wm_x11_set_input_focus(host.display, clt.app)
+}
+
 func (host *WmHost) wm_host_run(){
 	for{
 		host.event = wm_x11_peek_event(host.display)

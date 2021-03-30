@@ -85,6 +85,10 @@ func wm_x11_raise_window(display *XDisplay, window XWindowID){
 	C.XRaiseWindow(display, window)
 }
 
+func wm_x11_set_input_focus(display *XDisplay, window XWindowID){
+	C.XSetInputFocus(display, window, C.RevertToNone, C.CurrentTime)
+}
+
 func wm_x11_get_window_attributes(display *XDisplay, window XWindowID) XWindowAttributes{
 	var attr XWindowAttributes
 	C.XGetWindowAttributes(display, window, &attr)
