@@ -7,6 +7,7 @@ type WmClientAddress = int
 type WmClient struct{
 	box WmTransparent
 	app XWindowID
+	mask WmTransparent
 }
 
 type WmTransparent struct{
@@ -50,4 +51,5 @@ type WmWindowRelation struct{
 const(
 	WM_DRAW_TYPE_NONE = 0
 	WM_DRAW_TYPE_BOX = 1
+	WM_DRAW_TYPE_MASK = 2
 )

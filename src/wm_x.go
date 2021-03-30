@@ -85,6 +85,10 @@ func wm_x11_raise_window(display *XDisplay, window XWindowID){
 	C.XRaiseWindow(display, window)
 }
 
+func wm_x11_lower_window(display *XDisplay, window XWindowID){
+	C.XLowerWindow(display, window)
+}
+
 func wm_x11_set_input_focus(display *XDisplay, window XWindowID){
 	C.XSetInputFocus(display, window, C.RevertToNone, C.CurrentTime)
 }
@@ -107,6 +111,10 @@ func wm_x11_resize_window(display *XDisplay, window XWindowID, w int, h int){
 
 func wm_x11_map_window(display *XDisplay, window XWindowID){
 	C.XMapWindow(display, window)
+} 
+
+func wm_x11_unmap_window(display *XDisplay, window XWindowID){
+	C.XUnmapWindow(display, window)
 } 
 
 func wm_x11_reparent_window(display *XDisplay, window XWindowID, parent XWindowID, x int, y int){
@@ -169,6 +177,8 @@ func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent){
 	switch transparent.drawtype{
 	case WM_DRAW_TYPE_BOX:
 		C.c_wm_transparent_draw_type_box(transparent.surface, surface_w, surface_h)
+	case WM_DRAW_TYPE_MASK:
+		C.c_wm_transparent_draw_type_mask(transparent.surface, surface_w, surface_h)
 	}
 
 }

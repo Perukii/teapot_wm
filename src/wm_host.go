@@ -24,6 +24,10 @@ func (host *WmHost) wm_host_raise_window(window XWindowID){
 	wm_x11_raise_window(host.display, window)
 }
 
+func (host *WmHost) wm_host_lower_window(window XWindowID){
+	wm_x11_lower_window(host.display, window)
+}
+
 func (host *WmHost) wm_host_get_window_attributes(window XWindowID) XWindowAttributes{
 	return wm_x11_get_window_attributes(host.display, window)
 }
@@ -40,10 +44,10 @@ func (host *WmHost) wm_host_select_input(window XWindowID, mask CLong){
 	wm_x11_select_input(host.display, window, mask)
 }
 
-func (host *WmHost) wm_host_setup_transparent(transparent *WmTransparent,
-														x int, y int, w int, h int,
-														){
-	wm_x11_create_transparent_window(host.display, host.root_window, x, y, w, h, transparent)
+func (host *WmHost) wm_host_setup_transparent(transparent *WmTransparent, parent XWindowID,
+											  x int, y int, w int, h int,
+											  ){
+	wm_x11_create_transparent_window(host.display, parent, x, y, w, h, transparent)
 }
 
 func (host *WmHost) wm_host_remove_transparent(transparent WmTransparent){
@@ -53,6 +57,10 @@ func (host *WmHost) wm_host_remove_transparent(transparent WmTransparent){
 
 func (host *WmHost) wm_host_map_window(window XWindowID){
 	wm_x11_map_window(host.display, window)
+}
+
+func (host *WmHost) wm_host_unmap_window(window XWindowID){
+	wm_x11_unmap_window(host.display, window)
 }
 
 func (host *WmHost) wm_host_draw_transparent(transparent WmTransparent){
@@ -85,6 +93,11 @@ func (host *WmHost) wm_host_update_client_focus(){
 	clt := host.client[len(host.client)-1]
 	wm_x11_raise_window(host.display, clt.box.window)
 	wm_x11_set_input_focus(host.display, clt.app)
+
+	for i := 1; i < len(host.client)-1; i++{
+		host.wm_client_deactivate(i)
+	}
+	host.wm_client_activate(len(host.client)-1)
 }
 
 func (host *WmHost) wm_host_run(){

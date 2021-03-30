@@ -15,6 +15,8 @@ func (host *WmHost) wm_event_loop_map_notify(){
 
 	host.wm_client_setup(&host.client[address], xmap.window)
 
+	host.wm_host_update_client_focus()
+
 }
 
 
@@ -55,19 +57,32 @@ func (host *WmHost) wm_event_loop_button_press(){
 	if xbutton.subwindow == XWindowID(XNone) { return }
 
 	address := host.wm_client_search(xbutton.subwindow)
+
 	if address == 0 { return }
 
-	host.wm_host_set_focus_to_client(address)
+	is_box := (xbutton.subwindow == host.client[address].box.window)
+	is_mask := (xbutton.subwindow == host.client[address].mask.window)
 
-	attr := host.wm_host_get_window_attributes(xbutton.subwindow)
-	host.grab_window = xbutton.subwindow
-	host.grab_button = int(xbutton.button)
-	host.grab_root_x = int(xbutton.x_root)
-	host.grab_root_y = int(xbutton.y_root)
-	host.grab_x = int(attr.x)
-	host.grab_y = int(attr.y)
-	host.grab_w = int(attr.width)
-	host.grab_h = int(attr.height)
+	if is_mask{
+		host.wm_host_set_focus_to_client(address)
+	}
+
+	if is_box{
+		attr := host.wm_host_get_window_attributes(host.client[address].box.window)
+		host.grab_window = host.client[address].box.window
+		host.grab_button = int(xbutton.button)
+		host.grab_root_x = int(xbutton.x_root)
+		host.grab_root_y = int(xbutton.y_root)
+		host.grab_x = int(attr.x)
+		host.grab_y = int(attr.y)
+		host.grab_w = int(attr.width)
+		host.grab_h = int(attr.height)
+	}
+
+
+	//host.wm_host_set_focus_to_client(address)
+
+
 
 
 }
