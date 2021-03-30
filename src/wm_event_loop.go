@@ -22,13 +22,15 @@ func (host *WmHost) wm_event_loop_unmap_notify(){
 	xunmap = *(*XUnmapEvent)(host.event.wm_event_get_pointer())
 	if xunmap.window == XWindowID(XNone) { return }
 	if xunmap.send_event == 0 { return }
-	
+	/*
 	address := host.wm_client_search(xunmap.window)
 	if address == 0 { return }
 	if host.client[address].app != xunmap.window { return }
 
 	host.wm_client_withdraw(address, false)
 	host.wm_host_update_client_focus()
+	*/
+	
 }
 
 func (host *WmHost) wm_event_loop_map_request(){
@@ -47,7 +49,7 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 
 	address := host.wm_client_search(xdestroy.window)
 	if address == 0 { return }
-	if host.client[address].app != xdestroy.window { return }
+	if xdestroy.window != host.client[address].app { return }
 
 	host.wm_client_withdraw(address, true)
 	host.wm_host_update_client_focus()
@@ -95,13 +97,6 @@ func (host *WmHost) wm_event_loop_configure_request(){
 							 int(xcfgreq.y)-border_width,
 							 int(xcfgreq.width)+border_width*2,
 							 int(xcfgreq.height)+border_width*2)
-/*
-	host.wm_host_move_window(clt.box.window, int(xcfgreq.x)-border_width, int(xcfgreq.y)-border_width)
-	host.wm_host_resize_window(clt.box.window,
-							   int(xcfgreq.width)+border_width*2,
-							   int(xcfgreq.height)+border_width*2)
-*/
-	
 
 }
 
