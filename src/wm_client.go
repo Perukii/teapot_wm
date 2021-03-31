@@ -40,7 +40,8 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 								   int(attr.width)+border_width*2,
 								   int(attr.height)+border_width*2)
 
-	host.wm_host_select_input(clt.mask.window, XSubstructureNotifyMask)
+	host.wm_host_select_input(clt.mask.window,
+				XSubstructureNotifyMask)
 	host.wm_host_map_window(clt.mask.window)
 
 	host.wm_host_draw_transparent(clt.mask)

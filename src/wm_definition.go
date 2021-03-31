@@ -37,6 +37,7 @@ type WmHost struct{
 	grab_h		int
 	grab_mode_1 int
 	grab_mode_2 int
+	grab_mode_configured int
 
 	cursor      int
 
@@ -64,5 +65,6 @@ const(
 	WM_RESIZE_MODE_BOTTOM = 2
 	WM_RESIZE_MODE_RIGHT = 3
 	WM_RESIZE_MODE_LEFT = 4
+
 
 )

@@ -17,7 +17,9 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
                                     int button_margin_width){
     cairo_t* ctx = cairo_create(surface);
-    cairo_set_operator(ctx, CAIRO_OPERATOR_SOURCE);
+    cairo_set_operator(ctx, CAIRO_OPERATOR_CLEAR);
+    cairo_paint(ctx);
+    cairo_set_operator(ctx, CAIRO_OPERATOR_OVER);
 
     double shadow_roughness = (double)(shadow_width)/5.0;
     if(shadow_roughness < 1) shadow_roughness = 1;
@@ -47,7 +49,7 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
 
     for(double i=1; i<=3; i++){
         double button_rev_x = border_width + button_margin_width;
-        double button_y     = border_width + button_margin_width;
+        double button_y     = border_width - button_width;
 
         double button_x = w-button_rev_x - button_width*i;
 

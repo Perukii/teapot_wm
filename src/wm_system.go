@@ -7,7 +7,16 @@ func wm_run(host *WmHost){
 	host.wm_host_init_log_file()
 	defer host.wm_host_close_log_file()
 
-	host.wm_host_select_input(host.root_window, XSubstructureNotifyMask | XButtonPressMask | XButtonReleaseMask | XPointerMotionMask | XSubstructureRedirectMask)
+	host.wm_host_select_input(host.root_window,
+		XSubstructureNotifyMask |
+		XButtonPressMask |
+		XButtonReleaseMask |
+		XPointerMotionMask |
+		XSubstructureRedirectMask)
+		/*
+		XEnterWindowMask |
+		XLeaveWindowMask )
+		*/
 
 	host.wm_host_define_cursor(XCLeftPtr)
 

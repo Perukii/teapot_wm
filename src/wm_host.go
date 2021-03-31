@@ -184,6 +184,10 @@ func (host *WmHost) wm_host_run(){
 			host.wm_event_loop_button_release()
 		case XMotionNotify:
 			host.wm_event_loop_motion_notify()
+		case XEnterNotify:
+			host.wm_event_loop_enter_notify()
+		case XLeaveNotify:
+			host.wm_event_loop_leave_notify()
 		}
 	}
 }

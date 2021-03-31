@@ -191,3 +191,12 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	host.wm_host_update_cursor()
 
 }
+
+
+func (host *WmHost) wm_event_loop_enter_notify(){
+
+}
+
+func (host *WmHost) wm_event_loop_leave_notify(){
+
+}

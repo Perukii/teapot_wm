@@ -28,6 +28,7 @@ type (
 	XDestroyWindowEvent = C.XDestroyWindowEvent
 	XConfigureEvent = C.XConfigureEvent
 	XConfigureRequestEvent = C.XConfigureRequestEvent
+	XCrossingEvent = C.XCrossingEvent
 
 	CairoSfc = C.cairo_surface_t
 	CairoCtx = C.cairo_t
@@ -47,12 +48,16 @@ const (
 	XDestroyNotify = int(C.DestroyNotify)
 	XConfigureNotify = int(C.ConfigureNotify)
 	XConfigureRequest = int(C.ConfigureRequest)
+	XEnterNotify = int(C.EnterNotify)
+	XLeaveNotify = int(C.LeaveNotify)
 
 	XSubstructureNotifyMask = CLong(C.SubstructureNotifyMask)
 	XSubstructureRedirectMask = CLong(C.SubstructureRedirectMask)
 	XButtonPressMask = CLong(C.ButtonPressMask)
 	XButtonReleaseMask = CLong(C.ButtonReleaseMask)
 	XPointerMotionMask = CLong(C.PointerMotionMask)
+	XEnterWindowMask = CLong(C.EnterWindowMask)
+	XLeaveWindowMask = CLong(C.LeaveWindowMask)
 
 	XCLeftPtr = int(C.XC_left_ptr)
 	XCSideT = int(C.XC_top_side)
