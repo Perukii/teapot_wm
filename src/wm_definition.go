@@ -5,7 +5,6 @@ import "os"
 type WmClientAddress = int
 
 type WmClient struct{
-	box WmTransparent
 	app XWindowID
 	mask WmTransparent
 }
