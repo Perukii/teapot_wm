@@ -146,7 +146,10 @@ func wm_x11_reparent_window(display *XDisplay, window XWindowID, parent XWindowI
 
 func wm_x11_destroy_window(display *XDisplay, window XWindowID){
 	C.XDestroyWindow(display, window)
-	//C.c_wm_x11_send_event(display, window, C.CString("WM_DELETE_WINDOW"))
+}
+
+func wm_x11_send_delete_event(display *XDisplay, window XWindowID){
+	C.c_wm_x11_send_event_destroy(display, window)
 }
 
 func wm_x11_destroy_cairo_surface(display *XDisplay, surface *CairoSfc){

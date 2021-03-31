@@ -122,6 +122,30 @@ func (host *WmHost) wm_event_loop_button_press(){
 
 func (host *WmHost) wm_event_loop_button_release(){
 	host.grab_window = XWindowID(XNone)
+
+	var xbutton XButtonEvent
+	xbutton = *(*XButtonEvent)(host.event.wm_event_get_pointer())
+	if xbutton.subwindow == XWindowID(XNone) { return }
+
+	address := host.wm_client_search(xbutton.subwindow)
+	if address == 0 { return }
+
+	clt := host.client[address]
+	if xbutton.subwindow != clt.mask.window { return }
+
+	attr := host.wm_host_get_window_attributes(clt.mask.window)
+	
+	host.wm_host_update_grab_mode(clt.mask.window,
+								  int(xbutton.x), int(xbutton.y),
+								  int(attr.x), int(attr.y), int(attr.width), int(attr.height),
+	)
+
+	//wm_debug_log("check", host.mask_button)
+
+	if host.mask_button == WM_BUTTON_EXIT {
+		host.wm_host_send_delete_event(clt.app)
+	}
+
 }
 
 func (host *WmHost) wm_event_loop_motion_notify(){
@@ -194,7 +218,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 
 func (host *WmHost) wm_event_loop_enter_notify(){
-
+	
 }
 
 func (host *WmHost) wm_event_loop_leave_notify(){

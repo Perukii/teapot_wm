@@ -4,7 +4,6 @@ int c_wm_x11_get_type_of_event(XEvent event){
 	return event.type;
 }
 
-
 void c_wm_x11_set_type_of_event(XEvent* event, int type){
 	event->type = type;
 }

@@ -37,7 +37,7 @@ type WmHost struct{
 	grab_h		int
 	grab_mode_1 int
 	grab_mode_2 int
-	grab_mode_configured int
+	mask_button int
 
 	cursor      int
 
@@ -66,5 +66,8 @@ const(
 	WM_RESIZE_MODE_RIGHT = 3
 	WM_RESIZE_MODE_LEFT = 4
 
-
+	WM_BUTTON_NONE = 0
+	WM_BUTTON_EXIT = 1
+	WM_BUTTON_MINIMIZE = 2
+	WM_BUTTON_MAXIMIZE = 3
 )

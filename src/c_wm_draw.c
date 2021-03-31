@@ -48,15 +48,13 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
     // button
 
     for(double i=1; i<=3; i++){
-        double button_rev_x = border_width + button_margin_width;
-        double button_y     = border_width - button_width;
+        double button_y = border_width - button_width - button_margin_width;
 
-        double button_x = w-button_rev_x - button_width*i;
+        double button_x = w - border_width - (button_width + button_margin_width)*i;
 
         cairo_rectangle(ctx, button_x, button_y, button_width, button_width);
         cairo_set_source(ctx, pattern_l[2+(int)i % 2]);
         cairo_fill(ctx);
-
 
         double icon_margin = button_width*0.3;
         double icon_sx = button_x+icon_margin;

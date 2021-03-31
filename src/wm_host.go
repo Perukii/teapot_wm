@@ -91,6 +91,10 @@ func (host *WmHost) wm_host_query_parent(window XWindowID) XWindowID{
 	return relation.parent
 }
 
+func (host *WmHost) wm_host_send_delete_event(window XWindowID){
+	wm_x11_send_delete_event(host.display, window)
+}
+
 func (host *WmHost) wm_host_check_n_of_queued_event() int{
 	return wm_x11_check_n_of_queued_event(host.display)
 }
@@ -113,6 +117,8 @@ func (host *WmHost) wm_host_update_client_focus(){
 	}
 	host.wm_client_raise_app(len(host.client)-1)
 }
+
+
 
 func (host *WmHost) wm_host_update_grab_mode(window XWindowID, point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 
@@ -138,6 +144,36 @@ func (host *WmHost) wm_host_update_grab_mode(window XWindowID, point_x int, poin
 	if grab_ry > mask_h-resize_area_width {
 		host.grab_mode_2 = WM_RESIZE_MODE_BOTTOM
 	}
+
+	var in_rect = func(px, py, x, y, w, h int) bool{
+		return (px >= x) && (px <= x+w) && (py >= y) && (py <= y+h)
+	}
+
+	host.mask_button = WM_BUTTON_NONE
+
+	border_width := host.config.client_drawable_range_border_width
+	button_width := host.config.client_button_width
+	button_margin_width := host.config.client_button_margin_width
+
+	for i := 1; i <= 3; i++ {
+        
+        button_x := mask_w - border_width - (button_width + button_margin_width)*i;
+		button_y := border_width - button_width - button_margin_width;
+
+		if in_rect(point_x-mask_x, point_y-mask_y, button_x, button_y, button_width, button_width){
+			switch i {
+			case 1:
+				host.mask_button = WM_BUTTON_EXIT
+			case 2:
+				host.mask_button = WM_BUTTON_MINIMIZE
+			case 3:
+				host.mask_button = WM_BUTTON_MAXIMIZE
+			}
+			break
+		}
+	}
+
+
 }
 
 func (host *WmHost) wm_host_update_cursor(){
