@@ -73,9 +73,7 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 }
 
 func (host *WmHost) wm_host_draw_transparent(transparent WmTransparent){
-	wm_x11_draw_transparent(host.display, transparent,
-							host.config.client_drawable_range_border_width,
-							host.config.client_grab_area_resize_width)
+	wm_x11_draw_transparent(host.display, transparent, host.config)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){

@@ -18,6 +18,8 @@ type WmTransparent struct{
 type WmConfig struct{
 	client_drawable_range_border_width int
 	client_grab_area_resize_width int
+	client_button_width int
+	client_button_margin_width int
 }
 
 type WmHost struct{

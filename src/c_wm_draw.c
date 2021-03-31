@@ -1,10 +1,10 @@
 #include <cairo/cairo-xlib.h>
 
-void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h, int border_width, int shadow_width){
+void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
+                                    int border_width, int shadow_width, int button_width, int button_margin_width){
     cairo_t* ctx = cairo_create(surface);
     cairo_set_operator(ctx, CAIRO_OPERATOR_SOURCE);
 
-    //int shadow_width = border_width/5;
     int shadow_roughness = shadow_width/3;
     if(shadow_roughness < 1) shadow_roughness = 1;
 
