@@ -15,10 +15,8 @@ func (host *WmHost) wm_client_search(window XWindowID) WmClientAddress{
 	return 0
 }
 
-func (host *WmHost) wm_client_withdraw(address WmClientAddress, app_is_destroyed bool){
+func (host *WmHost) wm_client_withdraw(address WmClientAddress){
 
-	//clt := host.client[address]
-	
 	host.wm_host_remove_transparent(host.client[address].mask)
 
 	host.client[address] = host.client[len(host.client)-1]

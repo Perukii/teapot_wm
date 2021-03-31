@@ -42,7 +42,7 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 	if address == 0 { return }
 	if xdestroy.window != host.client[address].app { return }
 
-	host.wm_client_withdraw(address, true)
+	host.wm_client_withdraw(address)
 	host.wm_host_update_client_focus()
 	
 }
