@@ -22,15 +22,6 @@ func (host *WmHost) wm_event_loop_unmap_notify(){
 	xunmap = *(*XUnmapEvent)(host.event.wm_event_get_pointer())
 	if xunmap.window == XWindowID(XNone) { return }
 	if xunmap.send_event == 0 { return }
-	/*
-	address := host.wm_client_search(xunmap.window)
-	if address == 0 { return }
-	if host.client[address].app != xunmap.window { return }
-
-	host.wm_client_withdraw(address, false)
-	host.wm_host_update_client_focus()
-	*/
-	
 }
 
 func (host *WmHost) wm_event_loop_map_request(){
@@ -62,24 +53,13 @@ func (host *WmHost) wm_event_loop_configure_notify(){
 	xconfig = *(*XConfigureEvent)(host.event.wm_event_get_pointer())
 	if xconfig.window == XWindowID(XNone) { return }
 
-	if host.wm_host_check_n_of_queued_event() >= 1 { return }
+	//if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
 	address := host.wm_client_search(xconfig.window)
 	if address == 0 { return }
-	/*
-	clt := host.client[address]
-	if xconfig.window != clt.box.window { return }
-
-	//host.wm_client_adjust_app_for_box(address)
-	//host.wm_client_adjust_mask_for_box(address)
-	
-	host.wm_host_resize_surface(clt.mask.surface, int(xconfig.width), int(xconfig.height))
-	host.wm_host_draw_transparent(clt.mask)
-	*/
 
 	clt := host.client[address]
 	if xconfig.window != clt.mask.window { return }
-
 	host.wm_host_draw_transparent(clt.mask)
 	
 }
@@ -90,17 +70,28 @@ func (host *WmHost) wm_event_loop_configure_request(){
 	xcfgreq = *(*XConfigureRequestEvent)(host.event.wm_event_get_pointer())
 	if xcfgreq.window == XWindowID(XNone) { return }
 
+	host.wm_host_move_window(xcfgreq.window, int(xcfgreq.x), int(xcfgreq.y))
+	host.wm_host_resize_window(xcfgreq.window, int(xcfgreq.width), int(xcfgreq.height))
+
 	address := host.wm_client_search(xcfgreq.window)
-	if address == 0 { return }
+	if address == 0 {
+
+		return
+	}
+
+	
+
 
 	clt := host.client[address]
 	if xcfgreq.window != clt.app { return }
+
 
 	host.wm_client_configure(address,
 							 int(xcfgreq.x),
 							 int(xcfgreq.y),
 							 int(xcfgreq.width),
 							 int(xcfgreq.height))
+	
 
 }
 
@@ -145,6 +136,8 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	
 	var motion XMotionEvent
 	motion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
+
+	if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
 	address := host.wm_client_search(host.grab_window)
 	clt := host.client[address]

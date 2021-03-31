@@ -35,7 +35,7 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 	border_width := host.config.client_drawable_range_border_width
 
 	// ---Mask---
-	clt.mask.drawtype = WM_DRAW_TYPE_MASK
+	clt.mask.drawtype = WM_DRAW_TYPE_BOX
 	host.wm_host_setup_transparent(&clt.mask, host.root_window,
 								   int(attr.x)-border_width,
 								   int(attr.y)-border_width,
@@ -48,16 +48,14 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 	host.wm_host_draw_transparent(clt.mask)
 }
 
-func (host *WmHost) wm_client_deactivate(address WmClientAddress){
+func (host *WmHost) wm_client_raise_mask(address WmClientAddress){
 	clt := host.client[address]
-	//attr := host.wm_host_get_window_attributes(clt.box.window)
-	//host.wm_client_configure(address, int(attr.x), int(attr.y), int(attr.width), int(attr.height))
 	host.wm_host_raise_window(clt.app)
 	host.wm_host_raise_window(clt.mask.window)
 	host.wm_host_draw_transparent(clt.mask)
 }
 
-func (host *WmHost) wm_client_activate(address WmClientAddress){
+func (host *WmHost) wm_client_raise_app(address WmClientAddress){
 	clt := host.client[address]
 	host.wm_host_raise_window(clt.mask.window)
 	host.wm_host_raise_window(clt.app)

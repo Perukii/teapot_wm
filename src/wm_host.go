@@ -73,7 +73,9 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 }
 
 func (host *WmHost) wm_host_draw_transparent(transparent WmTransparent){
-	wm_x11_draw_transparent(host.display, transparent, host.config.client_drawable_range_border_width)
+	wm_x11_draw_transparent(host.display, transparent,
+							host.config.client_drawable_range_border_width,
+							host.config.client_grab_area_resize_width)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){
@@ -107,9 +109,9 @@ func (host *WmHost) wm_host_update_client_focus(){
 	wm_x11_set_input_focus(host.display, clt.app)
 
 	for i := 1; i < len(host.client)-1; i++{
-		host.wm_client_deactivate(i)
+		host.wm_client_raise_mask(i)
 	}
-	host.wm_client_activate(len(host.client)-1)
+	host.wm_client_raise_app(len(host.client)-1)
 }
 
 func (host *WmHost) wm_host_update_grab_mode(window XWindowID, bx int, by int){
