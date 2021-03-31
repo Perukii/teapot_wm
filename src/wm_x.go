@@ -195,7 +195,8 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 
 }
 
-func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent, config WmConfig){
+func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent,
+							 config WmConfig, mask_button int){
 
 	attr := wm_x11_get_window_attributes(display, transparent.window)
 	surface_w := attr.width
@@ -207,7 +208,8 @@ func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent, confi
 										 C.int(config.client_drawable_range_border_width),
 										 C.int(config.client_grab_area_resize_width),
 										 C.int(config.client_button_width),
-										 C.int(config.client_button_margin_width))
+										 C.int(config.client_button_margin_width),
+										 C.int(mask_button))
 	case WM_DRAW_TYPE_MASK:
 		C.c_wm_transparent_draw_type_mask(transparent.surface, surface_w, surface_h)
 	}

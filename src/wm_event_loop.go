@@ -105,6 +105,14 @@ func (host *WmHost) wm_event_loop_button_press(){
 
 	if is_mask{
 		host.wm_host_set_focus_to_client(address)
+
+		attr := host.wm_host_get_window_attributes(clt.mask.window)
+
+		host.wm_host_update_button_mode(int(xbutton.x), int(xbutton.y),
+				int(attr.x), int(attr.y), int(attr.width), int(attr.height),
+		)
+
+		host.wm_host_draw_transparent(clt.mask)
 	}
 
 	attr := host.wm_host_get_window_attributes(clt.app)
@@ -133,18 +141,13 @@ func (host *WmHost) wm_event_loop_button_release(){
 	clt := host.client[address]
 	if xbutton.subwindow != clt.mask.window { return }
 
-	attr := host.wm_host_get_window_attributes(clt.mask.window)
-	
-	host.wm_host_update_grab_mode(clt.mask.window,
-								  int(xbutton.x), int(xbutton.y),
-								  int(attr.x), int(attr.y), int(attr.width), int(attr.height),
-	)
-
-	//wm_debug_log("check", host.mask_button)
-
 	if host.mask_button == WM_BUTTON_EXIT {
 		host.wm_host_send_delete_event(clt.app)
 	}
+
+	host.mask_button = WM_BUTTON_NONE
+
+	host.wm_host_draw_transparent(clt.mask)
 
 }
 
@@ -208,11 +211,21 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	clt := host.client[address]
 	attr := host.wm_host_get_window_attributes(clt.mask.window)
 	
-	host.wm_host_update_grab_mode(clt.mask.window,
-								  int(xmotion.x), int(xmotion.y),
+	host.wm_host_update_button_mode(int(xmotion.x), int(xmotion.y),
+								    int(attr.x), int(attr.y), int(attr.width), int(attr.height),
+	)
+	if host.mask_button != WM_BUTTON_NONE {
+		host.grab_mode_1 = WM_RESIZE_MODE_NONE
+		host.grab_mode_2 = WM_RESIZE_MODE_NONE
+		host.wm_host_define_cursor(XCLeftPtr)
+		return
+	}
+
+	host.wm_host_update_grab_mode(int(xmotion.x), int(xmotion.y),
 								  int(attr.x), int(attr.y), int(attr.width), int(attr.height),
 	)
 	host.wm_host_update_cursor()
+
 
 }
 

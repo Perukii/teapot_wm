@@ -73,7 +73,7 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 }
 
 func (host *WmHost) wm_host_draw_transparent(transparent WmTransparent){
-	wm_x11_draw_transparent(host.display, transparent, host.config)
+	wm_x11_draw_transparent(host.display, transparent, host.config, host.mask_button)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){
@@ -118,9 +118,7 @@ func (host *WmHost) wm_host_update_client_focus(){
 	host.wm_client_raise_app(len(host.client)-1)
 }
 
-
-
-func (host *WmHost) wm_host_update_grab_mode(window XWindowID, point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
+func (host *WmHost) wm_host_update_grab_mode(point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 
 	resize_area_width := host.config.client_grab_area_resize_width
 
@@ -144,7 +142,9 @@ func (host *WmHost) wm_host_update_grab_mode(window XWindowID, point_x int, poin
 	if grab_ry > mask_h-resize_area_width {
 		host.grab_mode_2 = WM_RESIZE_MODE_BOTTOM
 	}
+}
 
+func (host *WmHost) wm_host_update_button_mode(point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 	var in_rect = func(px, py, x, y, w, h int) bool{
 		return (px >= x) && (px <= x+w) && (py >= y) && (py <= y+h)
 	}
@@ -172,8 +172,6 @@ func (host *WmHost) wm_host_update_grab_mode(window XWindowID, point_x int, poin
 			break
 		}
 	}
-
-
 }
 
 func (host *WmHost) wm_host_update_cursor(){

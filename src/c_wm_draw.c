@@ -15,7 +15,7 @@ void rectangle_shadow(cairo_t* ctx, int x, int y, int w, int h,
 
 void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
-                                    int button_margin_width){
+                                    int button_margin_width, int mask_button){
     cairo_t* ctx = cairo_create(surface);
     cairo_set_operator(ctx, CAIRO_OPERATOR_CLEAR);
     cairo_paint(ctx);
@@ -52,8 +52,11 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
 
         double button_x = w - border_width - (button_width + button_margin_width)*i;
 
+        rectangle_shadow(ctx, button_x, button_y, button_width, button_width,
+                button_margin_width, shadow_roughness);
+
         cairo_rectangle(ctx, button_x, button_y, button_width, button_width);
-        cairo_set_source(ctx, pattern_l[2+(int)i % 2]);
+        cairo_set_source(ctx, pattern_l[1+(int)i % 2 + (int)(mask_button == i) ]);
         cairo_fill(ctx);
 
         double icon_margin = button_width*0.3;
@@ -82,8 +85,6 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
             case 3:{
                 cairo_rectangle(ctx, icon_sx, icon_sy, icon_ex-icon_sx, icon_ey-icon_sy);
                 cairo_stroke(ctx);
-                rectangle_shadow(ctx, button_x, button_y, button_width*3, button_width,
-                        button_margin_width, shadow_roughness);
                 break;
             }
         }
