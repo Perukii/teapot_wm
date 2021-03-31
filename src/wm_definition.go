@@ -5,10 +5,8 @@ import "os"
 type WmClientAddress = int
 
 type WmClient struct{
-	box WmTransparent
 	app XWindowID
 	mask WmTransparent
-	is_configured bool
 }
 
 type WmTransparent struct{
@@ -19,6 +17,7 @@ type WmTransparent struct{
 
 type WmConfig struct{
 	client_drawable_range_border_width int
+	client_grab_area_resize_width int
 }
 
 type WmHost struct{
@@ -34,6 +33,10 @@ type WmHost struct{
 	grab_button int
 	grab_w		int
 	grab_h		int
+	grab_mode_1 int
+	grab_mode_2 int
+
+	cursor      int
 
 	log_file *os.File
 
@@ -53,4 +56,11 @@ const(
 	WM_DRAW_TYPE_NONE = 0
 	WM_DRAW_TYPE_BOX = 1
 	WM_DRAW_TYPE_MASK = 2
+
+	WM_RESIZE_MODE_NONE = 0
+	WM_RESIZE_MODE_TOP = 1
+	WM_RESIZE_MODE_BOTTOM = 2
+	WM_RESIZE_MODE_RIGHT = 3
+	WM_RESIZE_MODE_LEFT = 4
+
 )
