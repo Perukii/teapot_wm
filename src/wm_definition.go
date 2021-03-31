@@ -7,6 +7,11 @@ type WmClientAddress = int
 type WmClient struct{
 	app XWindowID
 	mask WmTransparent
+	maximize_mode int
+	reverse_x int
+	reverse_y int
+	reverse_w int
+	reverse_h int
 }
 
 type WmTransparent struct{
@@ -70,4 +75,7 @@ const(
 	WM_BUTTON_EXIT = 1
 	WM_BUTTON_MINIMIZE = 2
 	WM_BUTTON_MAXIMIZE = 3
+
+	WM_CLIENT_MAXIMIZE_MODE_NORMAL  = 0
+	WM_CLIENT_MAXIMIZE_MODE_REVERSE = 1
 )

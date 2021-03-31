@@ -53,8 +53,6 @@ func (host *WmHost) wm_event_loop_configure_notify(){
 	xconfig = *(*XConfigureEvent)(host.event.wm_event_get_pointer())
 	if xconfig.window == XWindowID(XNone) { return }
 
-	//if host.wm_host_check_n_of_queued_event() >= 1 { return }
-
 	address := host.wm_client_search(xconfig.window)
 	if address == 0 { return }
 
@@ -113,6 +111,8 @@ func (host *WmHost) wm_event_loop_button_press(){
 		)
 
 		host.wm_host_draw_transparent(clt.mask)
+
+		if host.mask_button != WM_BUTTON_NONE { return }
 	}
 
 	attr := host.wm_host_get_window_attributes(clt.app)
@@ -124,8 +124,6 @@ func (host *WmHost) wm_event_loop_button_press(){
 	host.grab_y = int(attr.y)
 	host.grab_w = int(attr.width)
 	host.grab_h = int(attr.height)
-
-	//	host.wm_host_update_grab_mode(clt.mask.window, int(xbutton.x), int(xbutton.y),)
 }
 
 func (host *WmHost) wm_event_loop_button_release(){
@@ -144,6 +142,16 @@ func (host *WmHost) wm_event_loop_button_release(){
 	if host.mask_button == WM_BUTTON_EXIT {
 		host.wm_host_send_delete_event(clt.app)
 	}
+
+	if host.mask_button == WM_BUTTON_MAXIMIZE {
+		if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NORMAL {
+			host.wm_client_maximize(address)
+		}
+		if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
+			host.wm_client_reverse_size(address)
+		}
+		
+	} 
 
 	host.mask_button = WM_BUTTON_NONE
 

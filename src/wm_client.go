@@ -45,6 +45,8 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 	host.wm_host_map_window(clt.mask.window)
 
 	host.wm_host_draw_transparent(clt.mask)
+
+	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }
 
 func (host *WmHost) wm_client_raise_mask(address WmClientAddress){
@@ -61,7 +63,7 @@ func (host *WmHost) wm_client_raise_app(address WmClientAddress){
 }
 
 func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w int, h int){
-	clt := host.client[address]
+	clt := &host.client[address]
 
 	border_width := host.config.client_drawable_range_border_width
 
@@ -71,4 +73,50 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	host.wm_host_move_window  (clt.mask.window, x-border_width, y-border_width)
 	host.wm_host_resize_transparent(clt.mask, w+border_width*2, h+border_width*2)
 	host.wm_host_draw_transparent(clt.mask)
+
+	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
+}
+
+func (host *WmHost) wm_client_maximize(address WmClientAddress){
+	
+	clt := &host.client[address]
+
+	{
+		attr := host.wm_host_get_window_attributes(clt.mask.window)
+		clt.reverse_x = int(attr.x)
+		clt.reverse_y = int(attr.y)
+		clt.reverse_w = int(attr.width)
+		clt.reverse_h = int(attr.height)
+	}
+	
+	{
+		border_width := host.config.client_drawable_range_border_width
+		shadow_width := host.config.client_grab_area_resize_width
+	
+		attr := host.wm_host_get_window_attributes(host.root_window)
+	
+		host.wm_client_configure(address,
+							int(attr.x)+shadow_width,
+							int(attr.y)+border_width,
+							int(attr.width)-shadow_width*2,
+							int(attr.height)-border_width-shadow_width)
+	}
+
+	
+	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_REVERSE
+}
+
+func (host *WmHost) wm_client_reverse_size(address WmClientAddress){
+
+	clt := &host.client[address]
+
+	border_width := host.config.client_drawable_range_border_width
+
+	host.wm_client_configure(address,
+		clt.reverse_x+border_width,
+		clt.reverse_y+border_width,
+		clt.reverse_w-border_width*2,
+		clt.reverse_h-border_width*2)
+	
+	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }
