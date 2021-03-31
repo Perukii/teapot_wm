@@ -129,13 +129,9 @@ func (host *WmHost) wm_event_loop_button_press(){
 		host.grab_y = int(attr.y)
 		host.grab_w = int(attr.width)
 		host.grab_h = int(attr.height)
+
+		host.wm_host_update_grab_mode(host.grab_window, int(xbutton.x), int(xbutton.y))
 	}
-
-
-	//host.wm_host_set_focus_to_client(address)
-
-
-
 
 }
 
@@ -147,18 +143,39 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	
 	var motion XMotionEvent
 	motion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
+
+
+	if host.grab_window != XWindowID(XNone) {
+
+		
+
+		xdiff := int(motion.x_root) - host.grab_root_x
+		ydiff := int(motion.y_root) - host.grab_root_y
+
+		if host.grab_mode_1 == 0 && host.grab_mode_2 == 0 {
+			host.wm_host_move_window(host.grab_window,
+									 host.grab_x + xdiff,
+									 host.grab_y + ydiff)
+		} else {
+
+			if host.grab_mode_1 == WM_RESIZE_MODE_NONE { xdiff = 0 }
+			if host.grab_mode_2 == WM_RESIZE_MODE_NONE { ydiff = 0 }
+			if host.grab_mode_1 == WM_RESIZE_MODE_LEFT { xdiff = -xdiff }
+			if host.grab_mode_2 == WM_RESIZE_MODE_TOP  { ydiff = -ydiff }
+
+			host.wm_host_resize_window(host.grab_window,
+									   host.grab_w + xdiff,
+									   host.grab_h + ydiff,
+			)
+
+			if host.grab_mode_1 == WM_RESIZE_MODE_RIGHT  { xdiff = 0 }
+			if host.grab_mode_2 == WM_RESIZE_MODE_BOTTOM { ydiff = 0 }
+
+			host.wm_host_move_window(host.grab_window,
+									 host.grab_x - xdiff,
+									 host.grab_y - ydiff)
+
+		}
 	
-	if host.grab_window == XWindowID(XNone) { return }
-
-	xdiff := int(motion.x_root) - host.grab_root_x
-	ydiff := int(motion.y_root) - host.grab_root_y
-
-	if host.grab_button == 1 {
-		host.wm_host_move_window(host.grab_window, host.grab_x + xdiff, host.grab_y + ydiff)
 	}
-
-	if host.grab_button == 3 {
-		host.wm_host_resize_window(host.grab_window, host.grab_w + xdiff, host.grab_h + ydiff)
-	}
-
 }

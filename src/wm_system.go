@@ -13,6 +13,7 @@ func wm_run(host *WmHost){
 	host.wm_host_define_cursor(XCLeftPtr)
 
 	host.config.client_drawable_range_border_width = 20
+	host.config.client_grab_area_resize_width = 10
 
 	host.wm_host_run()
 }

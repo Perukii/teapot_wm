@@ -73,7 +73,7 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 }
 
 func (host *WmHost) wm_host_draw_transparent(transparent WmTransparent){
-	wm_x11_draw_transparent(host.display, transparent)
+	wm_x11_draw_transparent(host.display, transparent, host.config.client_drawable_range_border_width)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){
@@ -111,6 +111,34 @@ func (host *WmHost) wm_host_update_client_focus(){
 		host.wm_client_deactivate(i)
 	}
 	host.wm_client_activate(len(host.client)-1)
+}
+
+func (host *WmHost) wm_host_update_grab_mode(window XWindowID, bx int, by int){
+
+	resize_area_width := host.config.client_grab_area_resize_width
+
+	attr := host.wm_host_get_window_attributes(window)
+
+	grab_rx := bx-int(attr.x)
+	grab_ry := by-int(attr.y)
+	
+	host.grab_mode_1 = WM_RESIZE_MODE_NONE
+
+	if grab_rx < resize_area_width  {
+		host.grab_mode_1 = WM_RESIZE_MODE_LEFT
+	}
+	if grab_rx > int(attr.width)-resize_area_width {
+		host.grab_mode_1 = WM_RESIZE_MODE_RIGHT
+	}
+
+	host.grab_mode_2 = WM_RESIZE_MODE_NONE
+
+	if grab_ry < resize_area_width  {
+		host.grab_mode_2 = WM_RESIZE_MODE_TOP
+	}
+	if grab_ry > int(attr.height)-resize_area_width {
+		host.grab_mode_2 = WM_RESIZE_MODE_BOTTOM
+	}
 }
 
 func (host *WmHost) wm_host_run(){

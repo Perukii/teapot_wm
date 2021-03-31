@@ -56,7 +56,6 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 
 	host.wm_host_draw_transparent(clt.box)
 
-
 	box_attr := host.wm_host_get_window_attributes(clt.box.window)
 
 	// ---Mask---
@@ -69,8 +68,6 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 
 	host.wm_host_select_input(clt.mask.window, XSubstructureNotifyMask)
 	host.wm_host_map_window(clt.mask.window)
-
-	clt.is_configured = true
 }
 
 func (host *WmHost) wm_client_deactivate(address WmClientAddress){

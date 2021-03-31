@@ -179,14 +179,16 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 
 }
 
-func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent){
+func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent, border_width int){
 
-	surface_w := C.cairo_image_surface_get_width(transparent.surface)
-	surface_h := C.cairo_image_surface_get_height(transparent.surface)
+
+	attr := wm_x11_get_window_attributes(display, transparent.window)
+	surface_w := attr.width
+	surface_h := attr.height
 
 	switch transparent.drawtype{
 	case WM_DRAW_TYPE_BOX:
-		C.c_wm_transparent_draw_type_box(transparent.surface, surface_w, surface_h)
+		C.c_wm_transparent_draw_type_box(transparent.surface, surface_w, surface_h, C.int(border_width))
 	case WM_DRAW_TYPE_MASK:
 		C.c_wm_transparent_draw_type_mask(transparent.surface, surface_w, surface_h)
 	}
