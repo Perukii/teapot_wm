@@ -83,6 +83,8 @@ func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, 
 }
 
 func (host *WmHost) wm_host_define_cursor(cursor int){
+	if host.cursor == cursor { return }
+	host.cursor = cursor
     wm_x11_define_cursor(host.display, host.root_window, cursor)
 }
 
@@ -114,21 +116,19 @@ func (host *WmHost) wm_host_update_client_focus(){
 	host.wm_client_raise_app(len(host.client)-1)
 }
 
-func (host *WmHost) wm_host_update_grab_mode(window XWindowID, bx int, by int){
+func (host *WmHost) wm_host_update_grab_mode(window XWindowID, point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 
 	resize_area_width := host.config.client_grab_area_resize_width
 
-	attr := host.wm_host_get_window_attributes(window)
-
-	grab_rx := bx-int(attr.x)
-	grab_ry := by-int(attr.y)
+	grab_rx := point_x-mask_x
+	grab_ry := point_y-mask_y
 	
 	host.grab_mode_1 = WM_RESIZE_MODE_NONE
 
 	if grab_rx < resize_area_width  {
 		host.grab_mode_1 = WM_RESIZE_MODE_LEFT
 	}
-	if grab_rx > int(attr.width)-resize_area_width {
+	if grab_rx > mask_w-resize_area_width {
 		host.grab_mode_1 = WM_RESIZE_MODE_RIGHT
 	}
 
@@ -137,9 +137,29 @@ func (host *WmHost) wm_host_update_grab_mode(window XWindowID, bx int, by int){
 	if grab_ry < resize_area_width  {
 		host.grab_mode_2 = WM_RESIZE_MODE_TOP
 	}
-	if grab_ry > int(attr.height)-resize_area_width {
+	if grab_ry > mask_h-resize_area_width {
 		host.grab_mode_2 = WM_RESIZE_MODE_BOTTOM
 	}
+}
+
+func (host *WmHost) wm_host_update_cursor(){
+	if host.grab_mode_1 == WM_RESIZE_MODE_NONE && host.grab_mode_2 == WM_RESIZE_MODE_NONE {
+		host.wm_host_define_cursor(XCLeftPtr)
+	}
+	mode_l := host.grab_mode_1 == WM_RESIZE_MODE_LEFT
+	mode_r := host.grab_mode_1 == WM_RESIZE_MODE_RIGHT
+	mode_t := host.grab_mode_2 == WM_RESIZE_MODE_TOP
+	mode_b := host.grab_mode_2 == WM_RESIZE_MODE_BOTTOM
+
+	if mode_l && mode_t { host.wm_host_define_cursor(XCSideTL);return }
+	if mode_r && mode_t { host.wm_host_define_cursor(XCSideTR);return }
+	if mode_l && mode_b { host.wm_host_define_cursor(XCSideBL);return }
+	if mode_r && mode_b { host.wm_host_define_cursor(XCSideBR);return }
+
+	if mode_t { host.wm_host_define_cursor(XCSideT);return } 
+	if mode_b { host.wm_host_define_cursor(XCSideB);return } 
+	if mode_l { host.wm_host_define_cursor(XCSideL);return } 
+	if mode_r { host.wm_host_define_cursor(XCSideR);return } 
 }
 
 func (host *WmHost) wm_host_run(){

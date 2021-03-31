@@ -36,6 +36,8 @@ type WmHost struct{
 	grab_mode_1 int
 	grab_mode_2 int
 
+	cursor      int
+
 	log_file *os.File
 
 	client []WmClient

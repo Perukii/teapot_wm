@@ -74,17 +74,10 @@ func (host *WmHost) wm_event_loop_configure_request(){
 	host.wm_host_resize_window(xcfgreq.window, int(xcfgreq.width), int(xcfgreq.height))
 
 	address := host.wm_client_search(xcfgreq.window)
-	if address == 0 {
-
-		return
-	}
-
-	
-
+	if address == 0 { return }
 
 	clt := host.client[address]
 	if xcfgreq.window != clt.app { return }
-
 
 	host.wm_client_configure(address,
 							 int(xcfgreq.x),
@@ -104,17 +97,18 @@ func (host *WmHost) wm_event_loop_button_press(){
 	if xbutton.subwindow == XWindowID(XNone) { return }
 
 	address := host.wm_client_search(xbutton.subwindow)
-
 	if address == 0 { return }
 
-	is_mask := (xbutton.subwindow == host.client[address].mask.window)
+	clt := host.client[address]
+
+	is_mask := (xbutton.subwindow == clt.mask.window)
 
 	if is_mask{
 		host.wm_host_set_focus_to_client(address)
 	}
 
-	attr := host.wm_host_get_window_attributes(host.client[address].app)
-	host.grab_window = host.client[address].app
+	attr := host.wm_host_get_window_attributes(clt.app)
+	host.grab_window = clt.app
 	host.grab_button = int(xbutton.button)
 	host.grab_root_x = int(xbutton.x_root)
 	host.grab_root_y = int(xbutton.y_root)
@@ -123,9 +117,7 @@ func (host *WmHost) wm_event_loop_button_press(){
 	host.grab_w = int(attr.width)
 	host.grab_h = int(attr.height)
 
-	host.wm_host_update_grab_mode(host.client[address].mask.window, int(xbutton.x), int(xbutton.y))
-
-
+	//	host.wm_host_update_grab_mode(clt.mask.window, int(xbutton.x), int(xbutton.y),)
 }
 
 func (host *WmHost) wm_event_loop_button_release(){
@@ -134,24 +126,25 @@ func (host *WmHost) wm_event_loop_button_release(){
 
 func (host *WmHost) wm_event_loop_motion_notify(){
 	
-	var motion XMotionEvent
-	motion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
-
-	if host.wm_host_check_n_of_queued_event() >= 1 { return }
-
-	address := host.wm_client_search(host.grab_window)
-	clt := host.client[address]
+	var xmotion XMotionEvent
+	xmotion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
 
 	if host.grab_window != XWindowID(XNone) {
-		xdiff := int(motion.x_root) - host.grab_root_x
-		ydiff := int(motion.y_root) - host.grab_root_y
+
+		if host.wm_host_check_n_of_queued_event() >= 1 { return }
+
+		address := host.wm_client_search(host.grab_window)
+		clt := host.client[address]
+
+		xdiff := int(xmotion.x_root) - host.grab_root_x
+		ydiff := int(xmotion.y_root) - host.grab_root_y
 
 		expx := host.grab_x
 		expy := host.grab_y
 		expw := host.grab_w
 		exph := host.grab_h
 
-		if host.grab_mode_1 == 0 && host.grab_mode_2 == 0 {
+		if host.grab_mode_1 == WM_RESIZE_MODE_NONE && host.grab_mode_2 == WM_RESIZE_MODE_NONE {
 			expx = host.grab_x + xdiff
 			expy = host.grab_y + ydiff
 		} else {
@@ -177,6 +170,24 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 		}
 
 		host.wm_client_configure(address, expx, expy, expw, exph)
-	
+		host.wm_host_update_cursor()
+
+		return
 	}
+
+	address := host.wm_client_search(xmotion.subwindow)
+	if address == 0 {
+		host.wm_host_define_cursor(XCLeftPtr)
+		return
+	}
+
+	clt := host.client[address]
+	attr := host.wm_host_get_window_attributes(clt.mask.window)
+	
+	host.wm_host_update_grab_mode(clt.mask.window,
+								  int(xmotion.x), int(xmotion.y),
+								  int(attr.x), int(attr.y), int(attr.width), int(attr.height),
+	)
+	host.wm_host_update_cursor()
+
 }

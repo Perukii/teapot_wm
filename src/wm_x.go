@@ -55,6 +55,14 @@ const (
 	XPointerMotionMask = CLong(C.PointerMotionMask)
 
 	XCLeftPtr = int(C.XC_left_ptr)
+	XCSideT = int(C.XC_top_side)
+	XCSideB = int(C.XC_bottom_side)
+	XCSideL = int(C.XC_left_side)
+	XCSideR = int(C.XC_right_side)
+	XCSideTL = int(C.XC_top_left_corner)
+	XCSideTR = int(C.XC_top_right_corner)
+	XCSideBL = int(C.XC_bottom_left_corner)
+	XCSideBR = int(C.XC_bottom_right_corner)
 )
 
 func wm_x11_open_display() *XDisplay{
