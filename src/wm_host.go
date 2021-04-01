@@ -109,9 +109,6 @@ func (host *WmHost) wm_host_set_focus_to_client(address WmClientAddress){
 }
 
 func (host *WmHost) wm_host_update_client_focus(){
-	clt := host.client[len(host.client)-1]
-	wm_x11_set_input_focus(host.display, clt.app)
-
 	for i := 1; i < len(host.client)-1; i++{
 		host.wm_client_raise_mask(i)
 	}

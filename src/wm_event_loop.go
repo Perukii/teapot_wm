@@ -34,6 +34,7 @@ func (host *WmHost) wm_event_loop_map_request(){
 }
 
 func (host *WmHost) wm_event_loop_destroy_notify(){
+
 	var xdestroy XDestroyWindowEvent
 	xdestroy = *(*XDestroyWindowEvent)(host.event.wm_event_get_pointer())
 	if xdestroy.window == XWindowID(XNone) { return }
@@ -43,8 +44,7 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 	if xdestroy.window != host.client[address].app { return }
 
 	host.wm_client_withdraw(address)
-	host.wm_host_update_client_focus()
-	
+
 }
 
 func (host *WmHost) wm_event_loop_configure_notify(){
