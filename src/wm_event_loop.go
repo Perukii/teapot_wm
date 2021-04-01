@@ -116,6 +116,12 @@ func (host *WmHost) wm_event_loop_button_press(){
 	}
 
 	attr := host.wm_host_get_window_attributes(clt.app)
+	if int(xbutton.x) >= int(attr.x) &&
+	   int(xbutton.x) <= int(attr.x) + int(attr.width) &&
+	   int(xbutton.y) >= int(attr.y) &&
+	   int(xbutton.y) <= int(attr.y) + int(attr.height) {
+		return
+	}
 
 	host.grab_window = clt.app
 	host.grab_button = int(xbutton.button)
