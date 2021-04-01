@@ -116,6 +116,7 @@ func (host *WmHost) wm_event_loop_button_press(){
 	}
 
 	attr := host.wm_host_get_window_attributes(clt.app)
+
 	host.grab_window = clt.app
 	host.grab_button = int(xbutton.button)
 	host.grab_root_x = int(xbutton.x_root)
@@ -169,7 +170,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 		if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
 		address := host.wm_client_search(host.grab_window)
-		clt := host.client[address]
+		clt := &host.client[address]
 
 		xdiff := int(xmotion.x_root) - host.grab_root_x
 		ydiff := int(xmotion.y_root) - host.grab_root_y
@@ -180,9 +181,24 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 		exph := host.grab_h
 
 		if host.grab_mode_1 == WM_RESIZE_MODE_NONE && host.grab_mode_2 == WM_RESIZE_MODE_NONE {
+
+			if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
+				host.wm_client_reverse_size(address)
+				reverse_w_before := clt.reverse_w
+				border_width := host.config.client_drawable_range_border_width
+				attr := host.wm_host_get_window_attributes(clt.app)
+				host.grab_x = int(xmotion.x)-reverse_w_before/2+border_width
+				host.grab_w = int(attr.width)
+				host.grab_h = int(attr.height)
+				return
+			}
+
 			expx = host.grab_x + xdiff
 			expy = host.grab_y + ydiff
+
 		} else {
+
+			if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE { return }
 
 			if host.grab_mode_1 == WM_RESIZE_MODE_NONE { xdiff = 0 }
 			if host.grab_mode_2 == WM_RESIZE_MODE_NONE { ydiff = 0 }
