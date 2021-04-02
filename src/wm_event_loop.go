@@ -219,6 +219,17 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 			expw = host.grab_w + xdiff
 			exph = host.grab_h + ydiff
 
+			if expw < clt.app_min_w {
+				expw = clt.app_min_w
+				xdiff = expw - host.grab_w
+			}
+			if clt.app_max_w != XNone && expw > clt.app_max_w { expx = clt.app_max_w }
+			if exph < clt.app_min_h {
+				exph = clt.app_min_h
+				ydiff = exph - host.grab_h
+			}
+			if clt.app_max_h != XNone && exph > clt.app_max_h { exph = clt.app_max_h }
+
 			if host.grab_mode_1 == WM_RESIZE_MODE_RIGHT  { xdiff = 0 }
 			if host.grab_mode_2 == WM_RESIZE_MODE_BOTTOM { ydiff = 0 }
 
