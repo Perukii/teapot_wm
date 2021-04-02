@@ -198,7 +198,7 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 }
 
 func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent,
-							 config WmConfig, mask_button int){
+							 config WmConfig, mask_button int, title string){
 
 	attr := wm_x11_get_window_attributes(display, transparent.window)
 	surface_w := attr.width
@@ -211,7 +211,8 @@ func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent,
 										 C.int(config.client_grab_area_resize_width),
 										 C.int(config.client_button_width),
 										 C.int(config.client_button_margin_width),
-										 C.int(mask_button))
+										 C.int(mask_button),
+										 C.CString(title))
 	case WM_DRAW_TYPE_MASK:
 		C.c_wm_transparent_draw_type_mask(transparent.surface, surface_w, surface_h)
 	}
@@ -257,6 +258,7 @@ func wm_x11_get_window_title(display *XDisplay, window XWindowID) string{
 	
 	name := C.c_wm_x11_get_window_title(display, window)
 	name_res := C.GoString(name)
-	C.free(unsafe.Pointer(name))
+	if name != nil { C.free(unsafe.Pointer(name)) }
 	return name_res
+
 }

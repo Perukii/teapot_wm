@@ -21,8 +21,9 @@ func (host *WmHost) wm_client_withdraw(address WmClientAddress){
 	host.client = host.client[:len(host.client)-1]
 }
 
-func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
+func (host *WmHost) wm_client_setup(address WmClientAddress, xapp XWindowID){
 
+	clt := &host.client[address]
 	clt.app = xapp
 
 	attr := host.wm_host_get_window_attributes(clt.app)
@@ -41,13 +42,17 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 				XSubstructureNotifyMask)
 	host.wm_host_map_window(clt.mask.window)
 
-	host.wm_host_draw_transparent(clt.mask)
+	
 
 	size_hints := host.wm_host_get_size_hints(clt.app)
 	clt.app_min_w = int(size_hints.min_width)
 	clt.app_min_h = int(size_hints.min_height)
 	clt.app_max_w = int(size_hints.max_width)
 	clt.app_max_h = int(size_hints.max_height)
+
+	clt.title = host.wm_host_get_window_title(clt.app)
+
+	host.wm_host_draw_client(address)
 
 	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }
@@ -56,7 +61,7 @@ func (host *WmHost) wm_client_raise_mask(address WmClientAddress){
 	clt := host.client[address]
 	host.wm_host_raise_window(clt.app)
 	host.wm_host_raise_window(clt.mask.window)
-	host.wm_host_draw_transparent(clt.mask)
+	host.wm_host_draw_client(address)
 }
 
 func (host *WmHost) wm_client_raise_app(address WmClientAddress){
@@ -81,7 +86,7 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 
 	host.wm_host_move_window  (clt.mask.window, x-border_width, y-border_width)
 	host.wm_host_resize_transparent(clt.mask, w+border_width*2, h+border_width*2)
-	host.wm_host_draw_transparent(clt.mask)
+	host.wm_host_draw_client(address)
 
 	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }

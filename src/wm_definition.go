@@ -16,6 +16,8 @@ type WmClient struct{
 	reverse_y int
 	reverse_w int
 	reverse_h int
+
+	title string
 }
 
 type WmTransparent struct{

@@ -11,7 +11,7 @@ func (host *WmHost) wm_event_loop_map_notify(){
 	address := host.wm_client_allocate_from_host()
 	if address == 0 { return }
 
-	host.wm_client_setup(&host.client[address], xmap.window)
+	host.wm_client_setup(address, xmap.window)
 
 	host.wm_host_update_client_focus()
 
@@ -58,7 +58,7 @@ func (host *WmHost) wm_event_loop_configure_notify(){
 
 	clt := host.client[address]
 	if xconfig.window != clt.mask.window { return }
-	host.wm_host_draw_transparent(clt.mask)
+	host.wm_host_draw_client(address)
 	
 }
 
@@ -110,7 +110,7 @@ func (host *WmHost) wm_event_loop_button_press(){
 				int(attr.x), int(attr.y), int(attr.width), int(attr.height),
 		)
 
-		host.wm_host_draw_transparent(clt.mask)
+		host.wm_host_draw_client(address)
 
 		if host.mask_button != WM_BUTTON_NONE { return }
 	}
@@ -162,7 +162,7 @@ func (host *WmHost) wm_event_loop_button_release(){
 
 	host.mask_button = WM_BUTTON_NONE
 
-	host.wm_host_draw_transparent(clt.mask)
+	host.wm_host_draw_client(address)
 
 }
 

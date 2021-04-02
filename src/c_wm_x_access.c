@@ -1,4 +1,5 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 int c_wm_x11_get_type_of_event(XEvent event){
 	return event.type;
@@ -28,6 +29,8 @@ Window c_wm_x11_query_window_from_array(Window* array, int n){
 
 char* c_wm_x11_get_window_title(Display* display, Window window){
 	char* title;
-	XStoreName(display, window, title);
+	XTextProperty proper;
+	XGetWMName(display, window, &proper);
+	title = proper.value;
 	return title;
 }

@@ -15,7 +15,8 @@ void rectangle_shadow(cairo_t* ctx, int x, int y, int w, int h,
 
 void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
-                                    int button_margin_width, int mask_button){
+                                    int button_margin_width, int mask_button,
+                                    char* title){
     cairo_t* ctx = cairo_create(surface);
     cairo_set_operator(ctx, CAIRO_OPERATOR_CLEAR);
     cairo_paint(ctx);
@@ -44,6 +45,38 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
 
     rectangle_shadow(ctx, shadow_width, shadow_width, w-shadow_width*2, h-shadow_width*2,
                         shadow_width, shadow_roughness);
+
+    //title
+    
+    cairo_select_font_face(ctx, "Serif",
+        CAIRO_FONT_SLANT_NORMAL,
+        CAIRO_FONT_WEIGHT_NORMAL);
+
+    cairo_set_font_size(ctx, button_width);
+
+    cairo_text_extents_t extents;
+    cairo_text_extents(ctx, title, &extents);
+
+    double textbox_x = border_width;
+    double textbox_y = border_width - button_width - button_margin_width;
+    double textbox_w = extents.width + button_margin_width*2;
+    double textbox_h = button_width + button_margin_width;
+
+    rectangle_shadow(ctx, textbox_x,
+                          textbox_y,
+                          textbox_w,
+                          textbox_h,
+                          button_margin_width,
+                          shadow_roughness);
+
+    cairo_rectangle(ctx, textbox_x, textbox_y, textbox_w, textbox_h);
+    cairo_set_source(ctx, pattern_l[0]);
+    cairo_fill(ctx);
+    
+    cairo_move_to(ctx, textbox_x + button_margin_width, textbox_y + textbox_h - button_margin_width);
+    cairo_set_source_rgb(ctx, 0.9, 0.9, 0.9);
+    cairo_show_text(ctx, title);  
+    
 
     // button
 
@@ -88,8 +121,9 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                 break;
             }
         }
-
     }
+
+
 
 }
 
