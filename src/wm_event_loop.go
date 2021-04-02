@@ -13,7 +13,7 @@ func (host *WmHost) wm_event_loop_map_notify(){
 
 	host.wm_client_setup(address, xmap.window)
 
-	host.wm_host_update_client_focus()
+	host.wm_host_restack_clients()
 
 }
 

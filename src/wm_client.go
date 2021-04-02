@@ -75,13 +75,7 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	clt := &host.client[address]
 
 	border_width := host.config.client_drawable_range_border_width
-/*
 
-	if w < clt.app_min_w { w = clt.app_min_w }
-	if clt.app_max_w != XNone && w > clt.app_max_w { w = clt.app_max_w }
-	if h < clt.app_min_h { h = clt.app_min_h }
-	if clt.app_max_h != XNone && h > clt.app_max_h { h = clt.app_max_h }
-*/
 	host.wm_host_move_window(clt.app, x, y)
 	host.wm_host_resize_window(clt.app, w, h)
 

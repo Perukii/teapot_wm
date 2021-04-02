@@ -106,15 +106,20 @@ func (host *WmHost) wm_host_check_n_of_queued_event() int{
 }
 
 func (host *WmHost) wm_host_set_focus_to_client(address WmClientAddress){
+
+	host.wm_client_raise_mask(len(host.client)-1)
+
 	clt := host.client[address]
 	for i := address; i < len(host.client)-1; i++{
 		host.client[i] = host.client[i+1]
 	}
 	host.client[len(host.client)-1] = clt
-	host.wm_host_update_client_focus()
+
+	host.wm_client_raise_app(len(host.client)-1)
+
 }
 
-func (host *WmHost) wm_host_update_client_focus(){
+func (host *WmHost) wm_host_restack_clients(){
 	for i := 1; i < len(host.client)-1; i++{
 		host.wm_client_raise_mask(i)
 	}
