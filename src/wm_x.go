@@ -229,7 +229,8 @@ func wm_x11_draw_transparent(display *XDisplay, transparent WmTransparent,
 										 C.int(config.client_button_width),
 										 C.int(config.client_button_margin_width),
 										 C.int(mask_button),
-										 C.CString(title))
+										 C.CString(title),
+										 C.int(len(title)))
 	case WM_DRAW_TYPE_MASK:
 		C.c_wm_transparent_draw_type_mask(transparent.surface, surface_w, surface_h)
 	}

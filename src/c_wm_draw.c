@@ -16,7 +16,7 @@ void rectangle_shadow(cairo_t* ctx, int x, int y, int w, int h,
 void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
                                     int button_margin_width, int mask_button,
-                                    char* title){
+                                    char* title, int n_title){
     cairo_t* ctx = cairo_create(surface);
     cairo_set_operator(ctx, CAIRO_OPERATOR_CLEAR);
     cairo_paint(ctx);
@@ -46,51 +46,33 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
     rectangle_shadow(ctx, shadow_width, shadow_width, w-shadow_width*2, h-shadow_width*2,
                         shadow_width, shadow_roughness);
 
-    //title
-    
-    cairo_select_font_face(ctx, "Serif",
-        CAIRO_FONT_SLANT_NORMAL,
-        CAIRO_FONT_WEIGHT_NORMAL);
-
-    cairo_set_font_size(ctx, button_width);
-
-    cairo_text_extents_t extents;
-    cairo_text_extents(ctx, title, &extents);
-
-    double textbox_x = border_width;
-    double textbox_y = border_width - button_width - button_margin_width;
-    double textbox_w = extents.width + button_margin_width*2;
-    double textbox_h = button_width + button_margin_width;
-
-    rectangle_shadow(ctx, textbox_x,
-                          textbox_y,
-                          textbox_w,
-                          textbox_h,
-                          button_margin_width,
-                          shadow_roughness);
-
-    cairo_rectangle(ctx, textbox_x, textbox_y, textbox_w, textbox_h);
-    cairo_set_source(ctx, pattern_l[0]);
-    cairo_fill(ctx);
-    
-    cairo_move_to(ctx, textbox_x + button_margin_width, textbox_y + textbox_h - button_margin_width);
-    cairo_set_source_rgb(ctx, 0.9, 0.9, 0.9);
-    cairo_show_text(ctx, title);  
-    
-
     // button
 
     for(double i=1; i<=3; i++){
         double button_y = border_width - button_width - button_margin_width;
 
         double button_x = w - border_width - (button_width + button_margin_width)*i;
+        double button_w = button_width;
+        double button_x_limit = border_width + button_margin_width;
 
-        rectangle_shadow(ctx, button_x, button_y, button_width, button_width,
-                button_margin_width, shadow_roughness);
+        if(button_x < button_x_limit){
+            
+            button_w -= button_x_limit-button_x;
+            button_x = button_x_limit;
 
-        cairo_rectangle(ctx, button_x, button_y, button_width, button_width);
+        }
+
+        if(button_w < 0)button_w = 0;
+        else{
+            rectangle_shadow(ctx, button_x, button_y, button_w, button_width,
+                    button_margin_width, shadow_roughness);
+        }
+
+        cairo_rectangle(ctx, button_x, button_y, button_w, button_width);
         cairo_set_source(ctx, pattern_l[1+(int)i % 2 + (int)(mask_button == i) ]);
         cairo_fill(ctx);
+
+        if(button_w < button_width) continue;
 
         double icon_margin = button_width*0.3;
         double icon_sx = button_x+icon_margin;
@@ -123,6 +105,51 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
         }
     }
 
+    //title
+    
+    cairo_select_font_face(ctx, "Serif",
+        CAIRO_FONT_SLANT_NORMAL,
+        CAIRO_FONT_WEIGHT_NORMAL);
+
+    cairo_set_font_size(ctx, button_width);
+
+    cairo_text_extents_t extents;
+    cairo_text_extents(ctx, title, &extents);
+
+    double textbox_x = border_width;
+    double textbox_y = border_width - button_width - button_margin_width;
+    double textbox_w = extents.width + button_margin_width*2;
+    double textbox_h = button_width + button_margin_width;
+    double textbox_ex_limit = w - border_width - button_margin_width - (button_width+button_margin_width)*3;
+
+    if(textbox_x + textbox_w > textbox_ex_limit){
+        textbox_w = textbox_ex_limit - textbox_x;
+        int i = n_title-1;
+        while(i >= 0 && textbox_w < extents.width + button_margin_width*2){
+            title[i] = ' ';
+            i--;
+            cairo_text_extents(ctx, title, &extents);
+        }
+    }
+
+    if(textbox_w < 0) textbox_w = 0;
+    else{
+        rectangle_shadow(ctx, textbox_x,
+                            textbox_y,
+                            textbox_w,
+                            textbox_h,
+                            button_margin_width,
+                            shadow_roughness);
+    }
+
+    cairo_rectangle(ctx, textbox_x, textbox_y, textbox_w, textbox_h);
+    cairo_set_source(ctx, pattern_l[0]);
+    cairo_fill(ctx);
+    
+    cairo_move_to(ctx, textbox_x + button_margin_width, textbox_y + textbox_h - button_margin_width);
+    cairo_set_source_rgb(ctx, 0.9, 0.9, 0.9);
+    cairo_show_text(ctx, title);  
+    
 
 
 }
