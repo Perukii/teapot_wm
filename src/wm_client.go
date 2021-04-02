@@ -84,9 +84,14 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	host.wm_host_move_window(clt.app, x, y)
 	host.wm_host_resize_window(clt.app, w, h)
 
-	host.wm_host_move_window  (clt.mask.window, x-border_width, y-border_width)
-	host.wm_host_resize_transparent(clt.mask, w+border_width*2, h+border_width*2)
-	host.wm_host_draw_client(address)
+	mask_x := x - border_width
+	mask_y := y - border_width
+	mask_w := w + border_width*2
+	mask_h := h + border_width*2
+
+	host.wm_host_move_window  (clt.mask.window, mask_x, mask_y)
+	host.wm_host_resize_window(clt.mask.window, mask_w, mask_h)
+	host.wm_host_resize_surface(clt.mask.surface, mask_w, mask_h)
 
 	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }

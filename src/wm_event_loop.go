@@ -68,14 +68,21 @@ func (host *WmHost) wm_event_loop_configure_request(){
 	xcfgreq = *(*XConfigureRequestEvent)(host.event.wm_event_get_pointer())
 	if xcfgreq.window == XWindowID(XNone) { return }
 
-	host.wm_host_move_window(xcfgreq.window, int(xcfgreq.x), int(xcfgreq.y))
-	host.wm_host_resize_window(xcfgreq.window, int(xcfgreq.width), int(xcfgreq.height))
+	var configure_normal = func(){
+		host.wm_host_move_window(xcfgreq.window, int(xcfgreq.x), int(xcfgreq.y))
+		host.wm_host_resize_window(xcfgreq.window, int(xcfgreq.width), int(xcfgreq.height))
+	}
 
 	address := host.wm_client_search(xcfgreq.window)
-	if address == 0 { return }
+	if address == 0 {
+		configure_normal()
+		return
+	}
 
 	clt := host.client[address]
-	if xcfgreq.window != clt.app { return }
+	if xcfgreq.window != clt.app {
+		return
+	}
 
 	host.wm_client_configure(address,
 							 int(xcfgreq.x),
@@ -211,10 +218,6 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 			if host.grab_mode_1 == WM_RESIZE_MODE_LEFT { xdiff = -xdiff }
 			if host.grab_mode_2 == WM_RESIZE_MODE_TOP  { ydiff = -ydiff }
 
-			host.wm_host_resize_window(clt.app,
-									   host.grab_w + xdiff,
-									   host.grab_h + ydiff,
-			)
 			expw = host.grab_w + xdiff
 			exph = host.grab_h + ydiff
 

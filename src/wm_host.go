@@ -47,11 +47,12 @@ func (host *WmHost) wm_host_resize_window(window XWindowID, w int, h int){
 func (host *WmHost) wm_host_resize_surface(surface *CairoSfc, w int, h int){
 	wm_x11_resize_surface(surface, w, h)
 }
-
+/*
 func (host *WmHost) wm_host_resize_transparent(transparent WmTransparent, w int, h int){
 	wm_x11_resize_window(host.display, transparent.window, w, h)
 	wm_x11_resize_surface(transparent.surface, w, h)
 }
+*/
 
 func (host *WmHost) wm_host_setup_transparent(transparent *WmTransparent, parent XWindowID,
 											  x int, y int, w int, h int,
