@@ -31,6 +31,9 @@ type (
 	XConfigureRequestEvent = C.XConfigureRequestEvent
 	XCrossingEvent = C.XCrossingEvent
 	XSizeHints = C.XSizeHints
+	XPropertyEvent = C.XPropertyEvent
+
+	XAtom = C.Atom
 
 	CairoSfc = C.cairo_surface_t
 	CairoCtx = C.cairo_t
@@ -52,6 +55,7 @@ const (
 	XConfigureRequest = int(C.ConfigureRequest)
 	XEnterNotify = int(C.EnterNotify)
 	XLeaveNotify = int(C.LeaveNotify)
+	XPropertyNotify = int(C.PropertyNotify)
 
 	XSubstructureNotifyMask = CLong(C.SubstructureNotifyMask)
 	XSubstructureRedirectMask = CLong(C.SubstructureRedirectMask)
@@ -60,6 +64,7 @@ const (
 	XPointerMotionMask = CLong(C.PointerMotionMask)
 	XEnterWindowMask = CLong(C.EnterWindowMask)
 	XLeaveWindowMask = CLong(C.LeaveWindowMask)
+	XPropertyChangeMask = CLong(C.PropertyChangeMask)
 
 	XCLeftPtr = int(C.XC_left_ptr)
 	XCSideT = int(C.XC_top_side)
@@ -70,6 +75,7 @@ const (
 	XCSideTR = int(C.XC_top_right_corner)
 	XCSideBL = int(C.XC_bottom_left_corner)
 	XCSideBR = int(C.XC_bottom_right_corner)
+
 )
 
 func wm_x11_open_display() *XDisplay{
@@ -156,6 +162,10 @@ func wm_x11_send_delete_event(display *XDisplay, window XWindowID){
 
 func wm_x11_destroy_cairo_surface(display *XDisplay, surface *CairoSfc){
 	C.cairo_surface_destroy(surface)
+}
+
+func wm_x11_intern_atom(display *XDisplay, name string) XAtom{
+	return C.XInternAtom(display, C.CString(name), 1)
 }
 
 func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,

@@ -128,6 +128,10 @@ func (host *WmHost) wm_host_get_window_title(window XWindowID) string{
 	return wm_x11_get_window_title(host.display, window)
 }
 
+func (host *WmHost) wm_host_intern_atom(name string) XAtom{
+	return wm_x11_intern_atom(host.display, name)
+}
+
 func (host *WmHost) wm_host_update_grab_mode(point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 
 	resize_area_width := host.config.client_grab_area_resize_width
@@ -232,6 +236,8 @@ func (host *WmHost) wm_host_run(){
 			host.wm_event_loop_enter_notify()
 		case XLeaveNotify:
 			host.wm_event_loop_leave_notify()
+		case XPropertyNotify:
+			host.wm_event_loop_property_notify()
 		}
 	}
 }

@@ -259,11 +259,29 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 }
 
-
 func (host *WmHost) wm_event_loop_enter_notify(){
 	
 }
 
 func (host *WmHost) wm_event_loop_leave_notify(){
+
+}
+
+func (host *WmHost) wm_event_loop_property_notify(){
+	var xproper XPropertyEvent
+	xproper = *(*XPropertyEvent)(host.event.wm_event_get_pointer())
+	if xproper.window == XWindowID(XNone) { return }
+	address := host.wm_client_search(xproper.window)
+	if address == 0 { return }
+	clt := &host.client[address]
+	if xproper.window != clt.app { return }
+
+	if xproper.atom == host.wm_host_intern_atom("NET_WM_NAME") ||
+	   xproper.atom == host.wm_host_intern_atom("WM_NAME") {
+		clt.title = host.wm_host_get_window_title(clt.app)
+
+		host.wm_host_draw_client(address)
+	}
+
 
 }

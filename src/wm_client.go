@@ -40,9 +40,9 @@ func (host *WmHost) wm_client_setup(address WmClientAddress, xapp XWindowID){
 
 	host.wm_host_select_input(clt.mask.window,
 				XSubstructureNotifyMask)
+	host.wm_host_select_input(clt.app,
+				XPropertyChangeMask)
 	host.wm_host_map_window(clt.mask.window)
-
-	
 
 	size_hints := host.wm_host_get_size_hints(clt.app)
 	clt.app_min_w = int(size_hints.min_width)
