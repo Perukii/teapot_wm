@@ -92,6 +92,7 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	host.wm_host_move_window  (clt.mask.window, mask_x, mask_y)
 	host.wm_host_resize_window(clt.mask.window, mask_w, mask_h)
 	host.wm_host_resize_surface(clt.mask.surface, mask_w, mask_h)
+	host.wm_host_draw_client(address)
 
 	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }

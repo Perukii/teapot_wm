@@ -48,7 +48,7 @@ func (host *WmHost) wm_event_loop_destroy_notify(){
 }
 
 func (host *WmHost) wm_event_loop_configure_notify(){
-	
+	/*
 	var xconfig XConfigureEvent
 	xconfig = *(*XConfigureEvent)(host.event.wm_event_get_pointer())
 	if xconfig.window == XWindowID(XNone) { return }
@@ -59,7 +59,7 @@ func (host *WmHost) wm_event_loop_configure_notify(){
 	clt := host.client[address]
 	if xconfig.window != clt.mask.window { return }
 	
-	
+	*/
 }
 
 
@@ -177,8 +177,6 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	
 	var xmotion XMotionEvent
 	xmotion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
-
-	if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
 	if host.grab_window != XWindowID(XNone) {
 
