@@ -20,6 +20,7 @@ func wm_run(host *WmHost){
 	host.config.client_grab_area_resize_width = 10
 	host.config.client_button_width = 15
 	host.config.client_button_margin_width = 5
+	host.config.max_config_wait = 1.5
 
 	host.wm_host_run()
 }

@@ -17,6 +17,8 @@ type WmClient struct{
 	reverse_w int
 	reverse_h int
 
+	config_wait float64
+
 	title string
 }
 
@@ -31,6 +33,7 @@ type WmConfig struct{
 	client_grab_area_resize_width int
 	client_button_width int
 	client_button_margin_width int
+	max_config_wait float64
 }
 
 type WmHost struct{
