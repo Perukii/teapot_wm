@@ -58,7 +58,7 @@ func (host *WmHost) wm_event_loop_configure_notify(){
 
 	clt := host.client[address]
 	if xconfig.window != clt.mask.window { return }
-	host.wm_host_draw_client(address)
+	
 	
 }
 
@@ -178,9 +178,9 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	var xmotion XMotionEvent
 	xmotion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
 
-	if host.grab_window != XWindowID(XNone) {
+	if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
-		if host.wm_host_check_n_of_queued_event() >= 1 { return }
+	if host.grab_window != XWindowID(XNone) {
 
 		address := host.wm_client_search(host.grab_window)
 		clt := &host.client[address]

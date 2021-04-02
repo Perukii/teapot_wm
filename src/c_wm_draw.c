@@ -36,10 +36,10 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
 
     cairo_set_source(ctx, pattern_l[0]);
 
-    cairo_rectangle(ctx, shadow_width, shadow_width, w-shadow_width*2, border_width-shadow_width); // top
-    cairo_rectangle(ctx, shadow_width, h-border_width, w-shadow_width*2, border_width-shadow_width); // bottom
-    cairo_rectangle(ctx, shadow_width, border_width, border_width-shadow_width, h-border_width*2); // left
-    cairo_rectangle(ctx, w-border_width, border_width, border_width-shadow_width, h-border_width*2); // right
+    cairo_rectangle(ctx, shadow_width, shadow_width, w-shadow_width*2, border_width-shadow_width-1); // top
+    cairo_rectangle(ctx, shadow_width, h-border_width-1, w-shadow_width*2, border_width-shadow_width+1); // bottom
+    cairo_rectangle(ctx, shadow_width, border_width-1, border_width-shadow_width-1, h-border_width*2+1); // left
+    cairo_rectangle(ctx, w-border_width-1, border_width-1, border_width-shadow_width+1, h-border_width*2+1); // right
 
     cairo_fill(ctx);
 
