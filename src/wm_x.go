@@ -7,6 +7,7 @@ package main
 #include <X11/Xutil.h>
 #include <cairo/cairo-xlib.h>
 #include <X11/cursorfont.h>
+#include <stdlib.h>
 #include "./c_wm_draw.h"
 #include "./c_wm_x_access.h"
 */
@@ -243,4 +244,19 @@ func wm_x11_query_tree(display *XDisplay, window XWindowID) WmWindowRelation{
 
 func wm_x11_check_n_of_queued_event(display *XDisplay) int{
 	return int(C.XEventsQueued(display, C.QueuedAlready))
+}
+
+func wm_x11_get_size_hints(display *XDisplay, window XWindowID) XSizeHints{
+	var hints XSizeHints
+	var supplied C.long
+	C.XGetWMNormalHints(display, window, &hints, &supplied)
+	return hints
+}
+
+func wm_x11_get_window_title(display *XDisplay, window XWindowID) string{
+	
+	name := C.c_wm_x11_get_window_title(display, window)
+	name_res := C.GoString(name)
+	C.free(unsafe.Pointer(name))
+	return name_res
 }

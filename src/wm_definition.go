@@ -7,6 +7,10 @@ type WmClientAddress = int
 type WmClient struct{
 	app XWindowID
 	mask WmTransparent
+	app_min_w int
+	app_min_h int
+	app_max_w int
+	app_max_h int
 	maximize_mode int
 	reverse_x int
 	reverse_y int

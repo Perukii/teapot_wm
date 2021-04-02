@@ -25,3 +25,9 @@ void c_wm_x11_send_event_destroy(Display* display, Window window){
 Window c_wm_x11_query_window_from_array(Window* array, int n){
 	return array[n];
 }
+
+char* c_wm_x11_get_window_title(Display* display, Window window){
+	char* title;
+	XStoreName(display, window, title);
+	return title;
+}

@@ -115,6 +115,14 @@ func (host *WmHost) wm_host_update_client_focus(){
 	host.wm_client_raise_app(len(host.client)-1)
 }
 
+func (host *WmHost) wm_host_get_size_hints(window XWindowID) XSizeHints{
+	return wm_x11_get_size_hints(host.display, window)
+}
+
+func (host *WmHost) wm_host_get_window_title(window XWindowID) string{
+	return wm_x11_get_window_title(host.display, window)
+}
+
 func (host *WmHost) wm_host_update_grab_mode(point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 
 	resize_area_width := host.config.client_grab_area_resize_width

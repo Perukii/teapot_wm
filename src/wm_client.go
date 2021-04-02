@@ -43,6 +43,12 @@ func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){
 
 	host.wm_host_draw_transparent(clt.mask)
 
+	size_hints := host.wm_host_get_size_hints(clt.app)
+	clt.app_min_w = int(size_hints.min_width)
+	clt.app_min_h = int(size_hints.min_height)
+	clt.app_max_w = int(size_hints.max_width)
+	clt.app_max_h = int(size_hints.max_height)
+
 	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }
 
@@ -57,12 +63,18 @@ func (host *WmHost) wm_client_raise_app(address WmClientAddress){
 	clt := host.client[address]
 	host.wm_host_raise_window(clt.mask.window)
 	host.wm_host_raise_window(clt.app)
+	
 }
 
 func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w int, h int){
 	clt := &host.client[address]
 
 	border_width := host.config.client_drawable_range_border_width
+
+	if w < clt.app_min_w { w = clt.app_min_w }
+	if clt.app_max_w != XNone && w > clt.app_max_w { w = clt.app_max_w }
+	if h < clt.app_min_h { h = clt.app_min_h }
+	if clt.app_max_h != XNone && h > clt.app_max_h { h = clt.app_max_h }
 
 	host.wm_host_move_window(clt.app, x, y)
 	host.wm_host_resize_window(clt.app, w, h)
