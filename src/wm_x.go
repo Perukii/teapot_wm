@@ -134,6 +134,13 @@ func wm_x11_resize_window(display *XDisplay, window XWindowID, w int, h int){
 	C.XResizeWindow(display, window, C.uint(w), C.uint(h))
 }
 
+func wm_x11_move_resize_window(display *XDisplay, window XWindowID, x int, y int, w int, h int){
+	if w < 1 { w = 1 }
+	if h < 1 { h = 1 }
+	C.XMoveResizeWindow(display, window, C.int(x), C.int(y), C.uint(w), C.uint(h))
+}
+
+
 func wm_x11_resize_surface(surface *CairoSfc, w int, h int){
 	if w < 1 { w = 1 }
 	if h < 1 { h = 1 }
