@@ -16,13 +16,9 @@ func (host *WmHost) wm_client_search(window XWindowID) WmClientAddress{
 }
 
 func (host *WmHost) wm_client_withdraw(address WmClientAddress){
-	wm_debug_log("1")
 	host.wm_host_remove_transparent(host.client[address].mask)
-	wm_debug_log("2")
-
 	host.client[address] = host.client[len(host.client)-1]
 	host.client = host.client[:len(host.client)-1]
-	wm_debug_log("3")
 }
 
 func (host *WmHost) wm_client_setup(clt *WmClient, xapp XWindowID){

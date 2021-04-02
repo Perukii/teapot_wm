@@ -29,6 +29,7 @@ type (
 	XConfigureEvent = C.XConfigureEvent
 	XConfigureRequestEvent = C.XConfigureRequestEvent
 	XCrossingEvent = C.XCrossingEvent
+	XSizeHints = C.XSizeHints
 
 	CairoSfc = C.cairo_surface_t
 	CairoCtx = C.cairo_t
