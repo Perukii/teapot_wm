@@ -6,7 +6,6 @@ func (host *WmHost) wm_host_init(){
 	host.client = []WmClient{}
 	var clt WmClient
 	host.client = append(host.client, clt)
-	host.press_last_window = XWindowID(XNone)
 }
 
 func (host *WmHost) wm_host_init_log_file(){

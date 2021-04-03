@@ -64,7 +64,6 @@ type WmHost struct{
 	press_down bool
 	press_left bool
 	press_right bool
-	press_last_window XWindowID
 
 	log_file *os.File
 

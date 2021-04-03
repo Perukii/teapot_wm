@@ -116,6 +116,7 @@ func (host *WmHost) wm_event_loop_key_press(){
 	}
 
 	var address WmClientAddress
+	/*
 	address = host.wm_client_search(xkey.window)
 	if address == 0 {
 		address = host.wm_client_search(host.press_last_window)
@@ -123,6 +124,8 @@ func (host *WmHost) wm_event_loop_key_press(){
 	} else {
 		host.press_last_window = xkey.window
 	}
+	*/
+	address = len(host.client)-1
 
 	if keycode == 113 && keyflag == true && host.press_menu == true {
 		host.wm_client_harf_maximize(address, false)
@@ -198,13 +201,13 @@ func (host *WmHost) wm_event_loop_button_press(){
 		mattr := host.wm_host_get_window_attributes(mclt.mask.window)
 		if mclt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_RIGHT {
 			diff := int(mattr.x) - (host.grab_x + host.grab_w + bs_diff)
-			if diff*diff < 256 {
+			if diff*diff <= bs_diff*bs_diff {
 				host.grab_comp_right = i
 				return
 			}
 		} else {
 			diff := int(mattr.x) + int(mattr.width) - (host.grab_x - bs_diff)
-			if diff*diff < 256 {
+			if diff*diff <= bs_diff*bs_diff {
 				host.grab_comp_left = i
 				return
 			}
@@ -321,23 +324,43 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 		}
 
+		if host.grab_comp_right + host.grab_comp_left > 0 {
+			rattr := host.wm_host_get_window_attributes(host.root_window)
+			border_width := host.config.client_drawable_range_border_width
+			shadow_width := host.config.client_grab_area_resize_width
+			bs_diff := border_width-shadow_width
+
+			comp_w := int(rattr.width)-expw-bs_diff*4
+	
+			if host.grab_comp_right != 0 {
+				cminw := host.client[host.grab_comp_right].app_min_w
+				if comp_w < cminw {
+					comp_w = cminw
+					expw = int(rattr.width)-comp_w-bs_diff*4
+					if expw < clt.app_min_w { return }
+				}
+				
+				host.wm_client_configure(host.grab_comp_right, expx+expw+bs_diff*2, expy,
+										 comp_w, exph)
+			}
+
+			if host.grab_comp_left != 0 {
+				cminw := host.client[host.grab_comp_left].app_min_w
+				if comp_w < cminw {
+					expw = int(rattr.width)-cminw-bs_diff*4
+					expx = expx + (cminw-comp_w)
+					comp_w = cminw
+					if expw < clt.app_min_w { return }
+				}
+				host.wm_client_configure(host.grab_comp_left, bs_diff, expy,
+										 comp_w, exph)
+			}
+		}
+
+
+
 		host.wm_client_configure(address, expx, expy, expw, exph)
 		host.wm_host_update_cursor()
-
-		border_width := host.config.client_drawable_range_border_width
-		shadow_width := host.config.client_grab_area_resize_width
-		bs_diff := border_width-shadow_width
-
-		if host.grab_comp_right != 0 {
-			rattr := host.wm_host_get_window_attributes(host.root_window)
-			host.wm_client_configure(host.grab_comp_right, expx+expw+bs_diff*2, expy,
-									 int(rattr.width)-expw-bs_diff*4, exph)
-		}
-		if host.grab_comp_left != 0 {
-			rattr := host.wm_host_get_window_attributes(host.root_window)
-			host.wm_client_configure(host.grab_comp_left, bs_diff, expy,
-									 int(rattr.width)-expw-bs_diff*4, exph)
-		}
 
 
 		return
