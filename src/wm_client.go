@@ -87,6 +87,15 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	host.wm_host_draw_client(address)
 }
 
+func (host *WmHost) wm_client_toggle_maxmize(address WmClientAddress){
+	clt := &host.client[address]
+	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
+		host.wm_client_reverse_size(address)
+	} else {
+		host.wm_client_maximize(address)
+	}
+}
+
 func (host *WmHost) wm_client_harf_maximize(address WmClientAddress, is_right bool){
 	if is_right{
 		host.wm_client_set_maximize(address, 0, 1)
@@ -134,9 +143,9 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 
 		host.wm_client_configure(address,
 							conf_x,
-							int(attr.y)+border_width,
+							int(attr.y) + border_width,
 							conf_w,
-							int(attr.height)-border_width-shadow_width)
+							int(attr.height) - border_width - bs_diff)
 	}
 	if left == 1 && right == 1{
 		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_REVERSE

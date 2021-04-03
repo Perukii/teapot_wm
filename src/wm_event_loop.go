@@ -58,7 +58,6 @@ func (host *WmHost) wm_event_loop_configure_notify(){
 
 	clt := host.client[address]
 	if xconfig.window != clt.mask.window { return }
-	
 	*/
 }
 
@@ -115,12 +114,7 @@ func (host *WmHost) wm_event_loop_key_press(){
 	case 114:
 		host.press_right = keyflag
 	}
-/*
-	if xkey.window != XWindowID(XNone){
-		host.press_last_window = xkey.window
-	}
-	if host.press_last_window == XWindowID(XNone) { return }
-*/
+
 	var address WmClientAddress
 	address = host.wm_client_search(xkey.window)
 	if address == 0 {
@@ -136,6 +130,11 @@ func (host *WmHost) wm_event_loop_key_press(){
 	if keycode == 114 && keyflag == true && host.press_menu == true {
 		host.wm_client_harf_maximize(address, true)
 	}
+	if keycode == 111 && keyflag == true && host.press_menu == true {
+		host.wm_client_toggle_maxmize(address)
+	}
+
+	host.wm_client_raise_mask(address)
 
 }
 
@@ -201,12 +200,7 @@ func (host *WmHost) wm_event_loop_button_release(){
 	}
 
 	if host.mask_button == WM_BUTTON_MAXIMIZE {
-		if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
-			host.wm_client_reverse_size(address)
-		} else {
-			host.wm_client_maximize(address)
-		}
-		
+		host.wm_client_toggle_maxmize(address)
 	} 
 
 	host.mask_button = WM_BUTTON_NONE
@@ -254,6 +248,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 				border_width := host.config.client_drawable_range_border_width
 				attr := host.wm_host_get_window_attributes(clt.app)
 				host.grab_x = int(xmotion.x)-reverse_w_before/2+border_width
+				host.grab_y = int(xmotion.y)
 				host.grab_w = int(attr.width)
 				host.grab_h = int(attr.height)
 				return
