@@ -112,15 +112,25 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	}
 	
 	{
+
+		
+		attr := host.wm_host_get_window_attributes(host.root_window)
 		border_width := host.config.client_drawable_range_border_width
 		shadow_width := host.config.client_grab_area_resize_width
-	
-		attr := host.wm_host_get_window_attributes(host.root_window)
 		
-		conf_w := (int(attr.width)-(border_width)*2)/(3-left-right)
-		conf_x := int(attr.x)+
-					(int(attr.width)/2+shadow_width)*right*(1-left)+
-					shadow_width*left*(1-right)
+		bs_diff := border_width-shadow_width
+
+		var conf_x, conf_w int
+		if left != 1 || right != 1{
+			conf_x = int(attr.x)+
+					(int(attr.width)/2+bs_diff)*right*(1-left)+
+					bs_diff*left*(1-right)
+			conf_w = (int(attr.width)-bs_diff*4)/2
+
+		} else {
+			conf_x = int(attr.x)+bs_diff
+			conf_w = int(attr.width)-bs_diff*2
+		}
 
 		host.wm_client_configure(address,
 							conf_x,

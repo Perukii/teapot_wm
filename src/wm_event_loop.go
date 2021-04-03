@@ -137,7 +137,6 @@ func (host *WmHost) wm_event_loop_key_press(){
 		host.wm_client_harf_maximize(address, true)
 	}
 
-	//wm_debug_log("ok")
 }
 
 func (host *WmHost) wm_event_loop_button_press(){
