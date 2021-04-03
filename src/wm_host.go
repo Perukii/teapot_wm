@@ -76,12 +76,14 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 }
 
 func (host *WmHost) wm_host_draw_transparent(transparent WmTransparent){
-	wm_x11_draw_transparent(host.display, transparent, host.config, 0, "")
+	wm_x11_draw_transparent(host.display, transparent, host.config, 0, "", false)
 }
 
 func (host *WmHost) wm_host_draw_client(address WmClientAddress){
 	clt := host.client[address]
-	wm_x11_draw_transparent(host.display, clt.mask, host.config, host.mask_button, clt.title)
+	wm_x11_draw_transparent(host.display, clt.mask,
+			host.config, host.mask_button, clt.title,
+			clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){

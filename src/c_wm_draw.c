@@ -16,7 +16,7 @@ void rectangle_shadow(cairo_t* ctx, int x, int y, int w, int h,
 void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
                                     int button_margin_width, int mask_button,
-                                    char* title, int n_title){
+                                    char* title, int n_title, int window_maximized){
     cairo_t* ctx = cairo_create(surface);
     cairo_set_operator(ctx, CAIRO_OPERATOR_CLEAR);
     cairo_paint(ctx);
@@ -79,6 +79,7 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
         double icon_sy = button_y+icon_margin;
         double icon_ex = button_x+button_width-icon_margin;
         double icon_ey = button_y+button_width-icon_margin;
+        double icon_3_adjust = 0.7;
         cairo_set_line_width(ctx, button_width*0.1);
         cairo_set_source_rgb(ctx, 0.9, 0.9, 0.9);
 
@@ -98,8 +99,26 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                 break;
             }
             case 3:{
-                cairo_rectangle(ctx, icon_sx, icon_sy, icon_ex-icon_sx, icon_ey-icon_sy);
-                cairo_stroke(ctx);
+                
+                double icon_w = icon_ex-icon_sx;
+                double icon_h = icon_ey-icon_sy;
+                double icon_margin = icon_w*(1.0-icon_3_adjust);
+                if(window_maximized){
+                    cairo_set_source_rgb(ctx, 0.5, 0.5, 0.5);   
+                    cairo_rectangle(ctx, icon_sx+icon_margin, icon_sy,
+                            icon_w*icon_3_adjust, icon_h*icon_3_adjust);
+                    cairo_stroke(ctx);
+                    cairo_set_source_rgb(ctx, 0.9, 0.9, 0.9);
+                    cairo_rectangle(ctx, icon_sx, icon_sy+icon_margin,
+                            icon_w*icon_3_adjust, icon_h*icon_3_adjust);
+                    cairo_stroke(ctx);
+
+                }
+                else{
+                    cairo_rectangle(ctx, icon_sx, icon_sy, icon_w, icon_h);
+                    cairo_stroke(ctx);
+                }
+                
                 break;
             }
         }
