@@ -180,6 +180,39 @@ func (host *WmHost) wm_event_loop_button_press(){
 	host.grab_y = int(attr.y)
 	host.grab_w = int(attr.width)
 	host.grab_h = int(attr.height)
+
+	host.grab_comp_left = 0
+	host.grab_comp_right = 0
+
+	if clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_RIGHT &&
+	   clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_LEFT { return }
+
+	border_width := host.config.client_drawable_range_border_width
+	shadow_width := host.config.client_grab_area_resize_width
+	bs_diff := border_width-shadow_width
+	   
+	for i := len(host.client)-1; i > 0; i-- {
+		mclt := &host.client[i]
+		if address == i { continue }
+		if mclt.maximize_mode == clt.maximize_mode { continue }
+		mattr := host.wm_host_get_window_attributes(mclt.mask.window)
+		if mclt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_RIGHT {
+			diff := int(mattr.x) - (host.grab_x + host.grab_w + bs_diff)
+			if diff*diff < 256 {
+				host.grab_comp_right = i
+				return
+			}
+		} else {
+			diff := int(mattr.x) + int(mattr.width) - (host.grab_x - bs_diff)
+			if diff*diff < 256 {
+				host.grab_comp_left = i
+				return
+			}
+		}
+		
+		
+	}
+	
 }
 
 func (host *WmHost) wm_event_loop_button_release(){
@@ -290,6 +323,22 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 		host.wm_client_configure(address, expx, expy, expw, exph)
 		host.wm_host_update_cursor()
+
+		border_width := host.config.client_drawable_range_border_width
+		shadow_width := host.config.client_grab_area_resize_width
+		bs_diff := border_width-shadow_width
+
+		if host.grab_comp_right != 0 {
+			rattr := host.wm_host_get_window_attributes(host.root_window)
+			host.wm_client_configure(host.grab_comp_right, expx+expw+bs_diff*2, expy,
+									 int(rattr.width)-expw-bs_diff*4, exph)
+		}
+		if host.grab_comp_left != 0 {
+			rattr := host.wm_host_get_window_attributes(host.root_window)
+			host.wm_client_configure(host.grab_comp_left, bs_diff, expy,
+									 int(rattr.width)-expw-bs_diff*4, exph)
+		}
+
 
 		return
 	}

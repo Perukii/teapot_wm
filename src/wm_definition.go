@@ -51,6 +51,10 @@ type WmHost struct{
 	grab_h		int
 	grab_mode_1 int
 	grab_mode_2 int
+
+	grab_comp_left  WmClientAddress
+	grab_comp_right WmClientAddress
+	
 	mask_button int
 
 	cursor      int
@@ -67,6 +71,10 @@ type WmHost struct{
 	client []WmClient
 
 	config WmConfig
+}
+
+type WmGeometry struct {
+	x, y, w, h int
 }
 
 type WmWindowRelation struct{
@@ -94,5 +102,6 @@ const(
 
 	WM_CLIENT_MAXIMIZE_MODE_NORMAL  = 0
 	WM_CLIENT_MAXIMIZE_MODE_REVERSE = 1
-	WM_CLIENT_MAXIMIZE_MODE_NEUTRAL = 2
+	WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_RIGHT = 2
+	WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_LEFT = 3
 )

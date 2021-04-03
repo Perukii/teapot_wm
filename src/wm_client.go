@@ -149,8 +149,10 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	}
 	if left == 1 && right == 1{
 		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_REVERSE
+	} else if left == 1 {
+		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_LEFT
 	} else {
-		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NEUTRAL
+		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_RIGHT
 	}
 	
 }
