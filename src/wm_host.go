@@ -6,6 +6,7 @@ func (host *WmHost) wm_host_init(){
 	host.client = []WmClient{}
 	var clt WmClient
 	host.client = append(host.client, clt)
+	host.press_last_window = XWindowID(XNone)
 }
 
 func (host *WmHost) wm_host_init_log_file(){
@@ -18,6 +19,9 @@ func (host *WmHost) wm_host_close_log_file(){
 
 func (host *WmHost) wm_host_grab_button(window XWindowID){
 	wm_x11_grab_button(host.display, window)
+}
+func (host *WmHost) wm_host_grab_key(window XWindowID, keycode int){
+	wm_x11_grab_key(host.display, window, keycode)
 }
 
 func (host *WmHost) wm_host_raise_window(window XWindowID){
@@ -228,6 +232,8 @@ func (host *WmHost) wm_host_run(){
 			host.wm_event_loop_configure_notify()
 		case XConfigureRequest:
 			host.wm_event_loop_configure_request()
+		case XKeyRelease:
+			fallthrough;
 		case XKeyPress:
 			host.wm_event_loop_key_press()
 		case XButtonPress:

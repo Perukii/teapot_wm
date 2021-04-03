@@ -94,6 +94,50 @@ func (host *WmHost) wm_event_loop_configure_request(){
 }
 
 func (host *WmHost) wm_event_loop_key_press(){
+	
+	var xkey XKeyEvent
+	xkey = *(*XKeyEvent)(host.event.wm_event_get_pointer())
+
+	xkeytype := host.event.wm_event_get_type()
+	keycode := int(xkey.keycode)
+
+	keyflag := xkeytype == XKeyPress
+
+	switch keycode{
+	case 133:
+		host.press_menu = keyflag
+	case 111:
+		host.press_up = keyflag
+	case 113:
+		host.press_left = keyflag
+	case 116:
+		host.press_down = keyflag
+	case 114:
+		host.press_right = keyflag
+	}
+/*
+	if xkey.window != XWindowID(XNone){
+		host.press_last_window = xkey.window
+	}
+	if host.press_last_window == XWindowID(XNone) { return }
+*/
+	var address WmClientAddress
+	address = host.wm_client_search(xkey.window)
+	if address == 0 {
+		address = host.wm_client_search(host.press_last_window)
+		if address == 0 { return }
+	} else {
+		host.press_last_window = xkey.window
+	}
+
+	if keycode == 113 && keyflag == true && host.press_menu == true {
+		host.wm_client_harf_maximize(address, false)
+	}
+	if keycode == 114 && keyflag == true && host.press_menu == true {
+		host.wm_client_harf_maximize(address, true)
+	}
+
+	//wm_debug_log("ok")
 }
 
 func (host *WmHost) wm_event_loop_button_press(){
@@ -158,11 +202,10 @@ func (host *WmHost) wm_event_loop_button_release(){
 	}
 
 	if host.mask_button == WM_BUTTON_MAXIMIZE {
-		if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NORMAL {
-			host.wm_client_maximize(address)
-		}
 		if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
 			host.wm_client_reverse_size(address)
+		} else {
+			host.wm_client_maximize(address)
 		}
 		
 	} 
@@ -177,6 +220,11 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	
 	var xmotion XMotionEvent
 	xmotion = *(*XMotionEvent)(host.event.wm_event_get_pointer())
+
+	grab_mode_top_when_maximized := func(address WmClientAddress) bool{
+		return host.client[address].maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NORMAL &&
+				host.grab_mode_2 == WM_RESIZE_MODE_TOP
+	}
 
 	//if host.wm_host_check_n_of_queued_event() >= 1 { return }
 
@@ -201,7 +249,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 		if host.grab_mode_1 == WM_RESIZE_MODE_NONE && host.grab_mode_2 == WM_RESIZE_MODE_NONE {
 
-			if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
+			if clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NORMAL {
 				host.wm_client_reverse_size(address)
 				reverse_w_before := clt.reverse_w
 				border_width := host.config.client_drawable_range_border_width
@@ -217,7 +265,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 		} else {
 
-			if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE { return }
+			if grab_mode_top_when_maximized(address) { return }
 
 			if host.grab_mode_1 == WM_RESIZE_MODE_NONE { xdiff = 0 }
 			if host.grab_mode_2 == WM_RESIZE_MODE_NONE { ydiff = 0 }
@@ -252,6 +300,8 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 		return
 	}
 
+
+
 	address := host.wm_client_search(xmotion.subwindow)
 	if address == 0 {
 		host.wm_host_define_cursor(XCLeftPtr)
@@ -274,6 +324,12 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 	host.wm_host_update_grab_mode(int(xmotion.x), int(xmotion.y),
 								  int(attr.x), int(attr.y), int(attr.width), int(attr.height),
 	)
+
+	if grab_mode_top_when_maximized(address) {
+		host.wm_host_define_cursor(XCLeftPtr)
+		return
+	}
+	
 	host.wm_host_update_cursor()
 
 

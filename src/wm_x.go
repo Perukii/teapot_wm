@@ -44,6 +44,7 @@ type (
 const (
 	XNone = C.None
 	XKeyPress = int(C.KeyPress)
+	XKeyRelease = int(C.KeyRelease)
 	XButtonPress = int(C.ButtonPress)
 	XButtonRelease = int(C.ButtonRelease)
 	XMotionNotify = int(C.MotionNotify)
@@ -65,6 +66,8 @@ const (
 	XEnterWindowMask = CLong(C.EnterWindowMask)
 	XLeaveWindowMask = CLong(C.LeaveWindowMask)
 	XPropertyChangeMask = CLong(C.PropertyChangeMask)
+	XKeyPressMask = CLong(C.KeyPressMask)
+	XKeyReleaseMask = CLong(C.KeyReleaseMask)
 
 	XCLeftPtr = int(C.XC_left_ptr)
 	XCSideT = int(C.XC_top_side)
@@ -100,6 +103,11 @@ func wm_x11_grab_button(display *XDisplay, window XWindowID){
     C.XGrabButton(display, C.AnyButton, C.Mod1Mask, window, C.True,
 		C.ButtonPressMask|C.ButtonReleaseMask|C.PointerMotionMask,
 		C.GrabModeAsync, C.GrabModeAsync, C.None, C.None)
+}
+
+func wm_x11_grab_key(display *XDisplay, window XWindowID, keycode int){
+	C.XGrabKey(display, C.int(keycode), C.Mod1Mask,
+				window, C.True, C.GrabModeAsync, C.GrabModeAsync)
 }
 
 func wm_x11_get_type_of_event(event *XEvent) int {

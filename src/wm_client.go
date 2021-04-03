@@ -39,9 +39,9 @@ func (host *WmHost) wm_client_setup(address WmClientAddress, xapp XWindowID){
 								   int(attr.height)+border_width*2)
 
 	host.wm_host_select_input(clt.mask.window,
-				XSubstructureNotifyMask)
+				XSubstructureNotifyMask | XKeyPressMask | XKeyReleaseMask)
 	host.wm_host_select_input(clt.app,
-				XPropertyChangeMask)
+				XPropertyChangeMask | XKeyPressMask | XKeyReleaseMask)
 	host.wm_host_map_window(clt.mask.window)
 
 	size_hints := host.wm_host_get_size_hints(clt.app)
@@ -85,15 +85,25 @@ func (host *WmHost) wm_client_configure(address WmClientAddress, x int, y int, w
 	host.wm_host_move_resize_window(clt.mask.window, mask_x, mask_y, mask_w, mask_h)
 	host.wm_host_resize_surface(clt.mask.surface, mask_w, mask_h)
 	host.wm_host_draw_client(address)
+}
 
-	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
+func (host *WmHost) wm_client_harf_maximize(address WmClientAddress, is_right bool){
+	if is_right{
+		host.wm_client_set_maximize(address, 0, 1)
+	} else {
+		host.wm_client_set_maximize(address, 1, 0)
+	}
 }
 
 func (host *WmHost) wm_client_maximize(address WmClientAddress){
+	host.wm_client_set_maximize(address, 1, 1)
+}
+
+func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, right int){
 	
 	clt := &host.client[address]
 
-	{
+	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NORMAL{
 		attr := host.wm_host_get_window_attributes(clt.mask.window)
 		clt.reverse_x = int(attr.x)
 		clt.reverse_y = int(attr.y)
@@ -106,16 +116,24 @@ func (host *WmHost) wm_client_maximize(address WmClientAddress){
 		shadow_width := host.config.client_grab_area_resize_width
 	
 		attr := host.wm_host_get_window_attributes(host.root_window)
-	
+		
+		conf_w := (int(attr.width)-(border_width)*2)/(3-left-right)
+		conf_x := int(attr.x)+
+					(int(attr.width)/2+shadow_width)*right*(1-left)+
+					shadow_width*left*(1-right)
+
 		host.wm_client_configure(address,
-							int(attr.x)+shadow_width,
+							conf_x,
 							int(attr.y)+border_width,
-							int(attr.width)-shadow_width*2,
+							conf_w,
 							int(attr.height)-border_width-shadow_width)
 	}
-
+	if left == 1 && right == 1{
+		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_REVERSE
+	} else {
+		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NEUTRAL
+	}
 	
-	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_REVERSE
 }
 
 func (host *WmHost) wm_client_reverse_size(address WmClientAddress){

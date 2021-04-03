@@ -55,6 +55,13 @@ type WmHost struct{
 
 	cursor      int
 
+	press_menu bool
+	press_up bool
+	press_down bool
+	press_left bool
+	press_right bool
+	press_last_window XWindowID
+
 	log_file *os.File
 
 	client []WmClient
@@ -87,4 +94,5 @@ const(
 
 	WM_CLIENT_MAXIMIZE_MODE_NORMAL  = 0
 	WM_CLIENT_MAXIMIZE_MODE_REVERSE = 1
+	WM_CLIENT_MAXIMIZE_MODE_NEUTRAL = 2
 )
