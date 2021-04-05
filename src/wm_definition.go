@@ -12,14 +12,14 @@ type WmClient struct{
 	app_max_w int
 	app_max_h int
 	maximize_mode int
-	reverse_x int
-	reverse_y int
-	reverse_w int
-	reverse_h int
-	latest_x int
-	latest_y int
-	latest_w int
-	latest_h int
+	app_reverse_x int
+	app_reverse_y int
+	app_reverse_w int
+	app_reverse_h int
+	app_latest_x int
+	app_latest_y int
+	app_latest_w int
+	app_latest_h int
 
 	config_wait float64
 

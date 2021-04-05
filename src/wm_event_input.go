@@ -172,11 +172,11 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 		if host.grab_mode_1 == WM_RESIZE_MODE_NONE && host.grab_mode_2 == WM_RESIZE_MODE_NONE {
 
 			if clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NORMAL {
-				host.wm_client_reverse_size(address)
-				reverse_w_before := clt.reverse_w
+				host.wm_client_app_reverse_size(address)
+				app_reverse_w_before := clt.app_reverse_w
 				border_width := host.config.client_drawable_range_border_width
 				attr := host.wm_host_get_window_attributes(clt.app)
-				host.grab_x = int(xmotion.x)-reverse_w_before/2+border_width
+				host.grab_x = int(xmotion.x)-app_reverse_w_before/2+border_width
 				host.grab_y = int(xmotion.y)
 				host.grab_w = int(attr.width)
 				host.grab_h = int(attr.height)
@@ -234,7 +234,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 				}
 				
 				host.wm_client_configure(host.grab_comp_right, expx+expw+bs_diff*2, expy,
-										 comp_w, exph)
+										 comp_w, exph, true)
 			}
 
 			if host.grab_comp_left != 0 {
@@ -246,13 +246,13 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 					if expw < clt.app_min_w { return }
 				}
 				host.wm_client_configure(host.grab_comp_left, bs_diff, expy,
-										 comp_w, exph)
+										 comp_w, exph, true)
 			}
 		}
 
 
 
-		host.wm_client_configure(address, expx, expy, expw, exph)
+		host.wm_client_configure(address, expx, expy, expw, exph, true)
 		host.wm_host_update_cursor()
 
 

@@ -84,10 +84,12 @@ func (host *WmHost) wm_event_loop_configure_request(){
 	}
 
 	host.wm_client_configure(address,
-							 int(xcfgreq.x),
-							 int(xcfgreq.y),
-							 int(xcfgreq.width),
-							 int(xcfgreq.height))
+		int(xcfgreq.x),
+		int(xcfgreq.y),
+		int(xcfgreq.width),
+		int(xcfgreq.height),
+		false,
+	)
 	
 
 }

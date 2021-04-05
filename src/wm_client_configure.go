@@ -1,13 +1,13 @@
 package main
 
 func (host *WmHost) wm_client_configure(address WmClientAddress,
-					x int, y int, w int, h int){
+					x int, y int, w int, h int, from_motion bool){
 
 	clt := &host.client[address]
 
-	resize_needed := w != clt.latest_w || h != clt.latest_h
+	resize_needed := w != clt.app_latest_w || h != clt.app_latest_h
 
-	if clt.config_wait > 0 && resize_needed{
+	if clt.config_wait > 0 && resize_needed && from_motion{
 		clt.config_wait--
 		return
 	}
@@ -21,7 +21,6 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 	mask_w := w + border_width*2
 	mask_h := h + border_width*2
 
-
 	if resize_needed {
 		host.wm_host_move_resize_window(clt.app, x, y, w, h)
 		host.wm_host_move_resize_window(clt.mask.window, mask_x, mask_y, mask_w, mask_h)
@@ -33,13 +32,13 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 	}
 
 
-	host.wm_client_update_latest_geometry(address, x, y, w, h)
+	host.wm_client_update_app_latest_geometry(address, x, y, w, h)
 }
 
 func (host *WmHost) wm_client_toggle_maxmize(address WmClientAddress){
 	clt := &host.client[address]
 	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE {
-		host.wm_client_reverse_size(address)
+		host.wm_client_app_reverse_size(address)
 	} else {
 		host.wm_client_maximize(address)
 	}
@@ -61,19 +60,15 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	
 	clt := &host.client[address]
 
-	
-
 	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NORMAL{
-		attr := host.wm_host_get_window_attributes(clt.mask.window)
-		clt.reverse_x = int(attr.x)
-		clt.reverse_y = int(attr.y)
-		clt.reverse_w = int(attr.width)
-		clt.reverse_h = int(attr.height)
+		//host.wm_client_update_app_latest_geometry_from_attributes(address)
+		clt.app_reverse_x = clt.app_latest_x
+		clt.app_reverse_y = clt.app_latest_y
+		clt.app_reverse_w = clt.app_latest_w
+		clt.app_reverse_h = clt.app_latest_h
 	}
 	
 	{
-
-		
 		rattr := host.wm_host_get_window_attributes(host.root_window)
 		border_width := host.config.client_drawable_range_border_width
 		shadow_width := host.config.client_grab_area_resize_width
@@ -93,10 +88,12 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 		}
 
 		host.wm_client_configure(address,
-							conf_x,
-							int(rattr.y) + border_width,
-							conf_w,
-							int(rattr.height) - border_width - bs_diff)
+			conf_x,
+			int(rattr.y) + border_width,
+			conf_w,
+			int(rattr.height) - border_width - bs_diff,
+			false,
+		)
 	}
 	if left == 1 && right == 1{
 		clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_REVERSE
@@ -108,40 +105,39 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	
 }
 
-func (host *WmHost) wm_client_reverse_size(address WmClientAddress){
+func (host *WmHost) wm_client_app_reverse_size(address WmClientAddress){
 
 	clt := &host.client[address]
 
-	border_width := host.config.client_drawable_range_border_width
-
 	host.wm_client_configure(address,
-		clt.reverse_x+border_width,
-		clt.reverse_y+border_width,
-		clt.reverse_w-border_width*2,
-		clt.reverse_h-border_width*2,
+		clt.app_reverse_x,
+		clt.app_reverse_y,
+		clt.app_reverse_w,
+		clt.app_reverse_h,
+		false,
 	)
 	
 	clt.maximize_mode = WM_CLIENT_MAXIMIZE_MODE_NORMAL
 }
 
-func (host *WmHost) wm_client_update_latest_geometry_from_attributes(address WmClientAddress){
+func (host *WmHost) wm_client_update_app_latest_geometry_from_attributes(address WmClientAddress){
 	
 	clt := &host.client[address]
 	attr := host.wm_host_get_window_attributes(clt.app)
 
-	clt.latest_x = int(attr.x)
-	clt.latest_y = int(attr.y)
-	clt.latest_w = int(attr.width)
-	clt.latest_h = int(attr.height)
+	clt.app_latest_x = int(attr.x)
+	clt.app_latest_y = int(attr.y)
+	clt.app_latest_w = int(attr.width)
+	clt.app_latest_h = int(attr.height)
 }
 
-func (host *WmHost) wm_client_update_latest_geometry(address WmClientAddress,
+func (host *WmHost) wm_client_update_app_latest_geometry(address WmClientAddress,
 					x int, y int, w int, h int){
 	
 	clt := &host.client[address]
 
-	clt.latest_x = x
-	clt.latest_y = y
-	clt.latest_w = w
-	clt.latest_h = h
+	clt.app_latest_x = x
+	clt.app_latest_y = y
+	clt.app_latest_w = w
+	clt.app_latest_h = h
 }
