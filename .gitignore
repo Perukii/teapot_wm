@@ -1,2 +1,5 @@
 wm
 wmlog.txt
+thirdparty
+startup.sh
+.gitignore
