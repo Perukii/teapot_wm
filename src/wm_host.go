@@ -1,8 +1,23 @@
+
 package main
 
+/*
+#cgo pkg-config: x11 cairo
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <cairo/cairo-xlib.h>
+#include <X11/cursorfont.h>
+#include <stdlib.h>
+#include "./c_wm_draw.h"
+#include "./c_wm_x_access.h"
+*/
+import "C"
+
+import "unsafe"
+
 func (host *WmHost) wm_host_init(){
-	host.display = wm_x11_open_display()
-	host.root_window = wm_x11_get_root(host.display)
+	host.display = C.XOpenDisplay(nil)
+	host.root_window = C.XDefaultRootWindow(host.display)
 	host.client = []WmClient{}
 	var clt WmClient
 	host.client = append(host.client, clt)
@@ -16,83 +31,106 @@ func (host *WmHost) wm_host_close_log_file(){
 	host.log_file.Close()
 }
 
-func (host *WmHost) wm_host_grab_button(window XWindowID){
-	wm_x11_grab_button(host.display, window)
-}
-func (host *WmHost) wm_host_grab_key(window XWindowID, keycode int){
-	wm_x11_grab_key(host.display, window, keycode)
-}
-
-func (host *WmHost) wm_host_raise_window(window XWindowID){
-	wm_x11_raise_window(host.display, window)
-}
-
-func (host *WmHost) wm_host_lower_window(window XWindowID){
-	wm_x11_lower_window(host.display, window)
-}
-
-func (host *WmHost) wm_host_get_window_attributes(window XWindowID) XWindowAttributes{
-	return wm_x11_get_window_attributes(host.display, window)
-}
-
 func (host *WmHost) wm_host_move_window(window XWindowID, x int, y int){
-	wm_x11_move_window(host.display, window, x, y)
-}
-
-func (host *WmHost) wm_host_select_input(window XWindowID, mask CLong){
-	wm_x11_select_input(host.display, window, mask)
+	C.XMoveWindow(host.display, window, C.int(x), C.int(y))
 }
 
 func (host *WmHost) wm_host_resize_window(window XWindowID, w int, h int){
-	wm_x11_resize_window(host.display, window, w, h)
-}
-
-func (host *WmHost) wm_host_resize_surface(surface *CairoSfc, w int, h int){
-	wm_x11_resize_surface(surface, w, h)
+	if w < 1 { w = 1 }
+	if h < 1 { h = 1 }
+	C.XResizeWindow(host.display, window, C.uint(w), C.uint(h))
 }
 
 func (host *WmHost) wm_host_move_resize_window(window XWindowID, x int, y int, w int, h int){
-	wm_x11_move_resize_window(host.display, window, x, y, w, h)
+	if w < 1 { w = 1 }
+	if h < 1 { h = 1 }
+	C.XMoveResizeWindow(host.display, window, C.int(x), C.int(y), C.uint(w), C.uint(h))
+}
+
+func (host *WmHost) wm_host_resize_surface(surface *CairoSfc, w int, h int){
+	if w < 1 { w = 1 }
+	if h < 1 { h = 1 }
+    C.cairo_xlib_surface_set_size(surface, C.int(w), C.int(h))
+}
+
+func (host *WmHost) wm_host_select_input(window XWindowID, mask CLong){
+	C.XSelectInput(host.display, window, mask)
+}
+
+func (host *WmHost) wm_host_get_window_attributes(window XWindowID) XWindowAttributes{
+	var attr XWindowAttributes
+	C.XGetWindowAttributes(host.display, window, &attr)
+	return attr
+}
+
+func (host *WmHost) wm_host_raise_window(window XWindowID){
+	C.XRaiseWindow(host.display, window)
+}
+
+func (host *WmHost) wm_host_lower_window(window XWindowID){
+	C.XLowerWindow(host.display, window)
 }
 
 func (host *WmHost) wm_host_setup_transparent(transparent *WmTransparent, parent XWindowID,
 											  x int, y int, w int, h int,
 											  ){
-	wm_x11_create_transparent_window(host.display, parent, x, y, w, h, transparent)
+	var vinfo C.XVisualInfo
+	C.XMatchVisualInfo(host.display, C.XDefaultScreen(host.display), 32, C.TrueColor, &vinfo)
+
+	var attr C.XSetWindowAttributes
+	attr.colormap = C.XCreateColormap(host.display, parent, vinfo.visual, C.AllocNone)
+	attr.border_pixel = 0
+	attr.background_pixel = 0
+	attr.override_redirect = 1
+	
+	transparent.window = C.XCreateWindow(
+		host.display,
+		parent,
+		C.int(x),
+		C.int(y),
+		C.uint(w),
+		C.uint(h),
+		C.uint(1),
+		vinfo.depth,
+		C.InputOutput,
+		vinfo.visual,
+		C.CWColormap|C.CWBorderPixel|C.CWBackPixel|C.CWOverrideRedirect,
+		&attr,
+	)
+	
+	transparent.surface = C.cairo_xlib_surface_create(
+		host.display,
+		transparent.window,
+		vinfo.visual,
+		C.int(w),
+		C.int(h),
+	)
+
 }
 
 func (host *WmHost) wm_host_remove_transparent(transparent WmTransparent){
-	wm_x11_destroy_window(host.display, transparent.window)
-	wm_x11_destroy_cairo_surface(host.display, transparent.surface)
+	C.XDestroyWindow(host.display, transparent.window)
+	C.cairo_surface_destroy(transparent.surface)
 }
 
 func (host *WmHost) wm_host_map_window(window XWindowID){
-	wm_x11_map_window(host.display, window)
+	C.XMapWindow(host.display, window)
 }
 
 func (host *WmHost) wm_host_unmap_window(window XWindowID){
-	wm_x11_unmap_window(host.display, window)
-}
-
-func (host *WmHost) wm_host_draw_client(address WmClientAddress){
-	clt := host.client[address]
-	wm_x11_draw_box(host.display, clt.mask,
-			&host.setting, host.mask_button, clt.title,
-			clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE)
-}
-
-func (host *WmHost) wm_host_draw_background(w int, h int){
-	wm_x11_draw_background(host.background, &host.setting, w, h)
+	C.XUnmapWindow(host.display, window)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){
-	wm_x11_reparent_window(host.display, window, parent ,x, y)
+	C.XReparentWindow(host.display, window, parent ,C.int(x), C.int(y))
 }
 
 func (host *WmHost) wm_host_define_cursor(cursor int){
 	if host.cursor == cursor { return }
 	host.cursor = cursor
-    wm_x11_define_cursor(host.display, host.root_window, cursor)
+    C.XDefineCursor(host.display, host.root_window,
+		C.XCreateFontCursor(host.display, C.uint(cursor)));
+
 }
 
 func (host *WmHost) wm_host_query_parent(window XWindowID) XWindowID{
@@ -101,11 +139,11 @@ func (host *WmHost) wm_host_query_parent(window XWindowID) XWindowID{
 }
 
 func (host *WmHost) wm_host_send_delete_event(window XWindowID){
-	wm_x11_send_delete_event(host.display, window)
+	C.c_wm_x11_send_event_destroy(host.display, window)
 }
 
 func (host *WmHost) wm_host_check_n_of_queued_event() int{
-	return wm_x11_check_n_of_queued_event(host.display)
+	return int(C.XEventsQueued(host.display, C.QueuedAlready))
 }
 
 func (host *WmHost) wm_host_set_focus_to_client(address WmClientAddress){
@@ -130,15 +168,21 @@ func (host *WmHost) wm_host_restack_clients(){
 }
 
 func (host *WmHost) wm_host_get_size_hints(window XWindowID) XSizeHints{
-	return wm_x11_get_size_hints(host.display, window)
+	var hints XSizeHints
+	var supplied C.long
+	C.XGetWMNormalHints(host.display, window, &hints, &supplied)
+	return hints
 }
 
 func (host *WmHost) wm_host_get_window_title(window XWindowID) string{
-	return wm_x11_get_window_title(host.display, window)
+	name := C.c_wm_x11_get_window_title(host.display, window)
+	name_res := C.GoString(name)
+	if name != nil { C.free(unsafe.Pointer(name)) }
+	return name_res
 }
 
 func (host *WmHost) wm_host_intern_atom(name string) XAtom{
-	return wm_x11_intern_atom(host.display, name)
+	return C.XInternAtom(host.display, C.CString(name), 1)
 }
 
 func (host *WmHost) wm_host_update_grab_mode(point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
@@ -217,9 +261,10 @@ func (host *WmHost) wm_host_update_cursor(){
 	if mode_r { host.wm_host_define_cursor(XCSideR);return } 
 }
 
+
 func (host *WmHost) wm_host_run(){
 	for{
-		host.event = wm_x11_peek_event(host.display)
+		C.XNextEvent(host.display, &host.event)
 		switch host.event.wm_event_get_type(){
 		case XMapNotify:
 			host.wm_event_loop_map_notify()
@@ -254,3 +299,29 @@ func (host *WmHost) wm_host_run(){
 }
 
 
+
+func (host *WmHost) wm_host_draw_client(address WmClientAddress){
+	clt := host.client[address]
+	attr := host.wm_host_get_window_attributes(clt.mask.window)
+	surface_w := attr.width
+	surface_h := attr.height
+
+	var maximized_val int = 0
+	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE { maximized_val = 1 }
+
+	C.c_wm_transparent_draw_box(clt.mask.surface, surface_w, surface_h,
+				C.int(host.setting.client_border_overall_width),
+				C.int(host.setting.client_border_shadow_width),
+				C.int(host.setting.client_button_width),
+				C.int(host.setting.client_button_margin_width),
+				C.int(host.mask_button),
+				C.int(host.setting.client_text_margin_width),
+				C.CString(clt.title),
+				C.int(len(clt.title)),
+				C.int(maximized_val))
+}
+
+func (host *WmHost) wm_host_draw_background(w int, h int){
+	C.c_wm_transparent_draw_background(host.background.surface,
+		C.CString(host.setting.background_file), C.int(w), C.int(h))
+}
