@@ -5,12 +5,18 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 
 	clt := &host.client[address]
 
+	move_needed   := x != clt.app_latest_x || y != clt.app_latest_y
 	resize_needed := w != clt.app_latest_w || h != clt.app_latest_h
+
+	if !(resize_needed || move_needed) {
+		return
+	}
 
 	if clt.config_wait > 0 && resize_needed && from_motion{
 		clt.config_wait--
 		return
 	}
+
 	clt.config_wait = host.config.max_config_wait
 
 	border_width := host.config.client_drawable_range_border_width
@@ -21,14 +27,21 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 	mask_w := w + border_width*2
 	mask_h := h + border_width*2
 
-	if resize_needed {
+	if resize_needed && move_needed {
 		host.wm_host_move_resize_window(clt.app, x, y, w, h)
 		host.wm_host_move_resize_window(clt.mask.window, mask_x, mask_y, mask_w, mask_h)
-		host.wm_host_resize_surface(clt.mask.surface, mask_w, mask_h)
-		host.wm_host_draw_client(address)
-	} else {
+	} else if move_needed {
 		host.wm_host_move_window(clt.app, x, y)
 		host.wm_host_move_window(clt.mask.window, mask_x, mask_y)
+	} else if resize_needed {
+		host.wm_host_resize_window(clt.app, w, h)
+		host.wm_host_resize_window(clt.mask.window, mask_w, mask_h)
+	}
+
+	if resize_needed {
+
+		host.wm_host_resize_surface(clt.mask.surface, mask_w, mask_h)
+		host.wm_host_draw_client(address)
 	}
 
 
@@ -61,7 +74,6 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	clt := &host.client[address]
 
 	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_NORMAL{
-		//host.wm_client_update_app_latest_geometry_from_attributes(address)
 		clt.app_reverse_x = clt.app_latest_x
 		clt.app_reverse_y = clt.app_latest_y
 		clt.app_reverse_w = clt.app_latest_w
