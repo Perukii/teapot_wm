@@ -155,18 +155,11 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 				host.grab_mode_2 == WM_RESIZE_MODE_TOP
 	}
 
-	//if host.wm_host_check_n_of_queued_event() >= 1 { return }
-
 	if host.grab_window != XWindowID(XNone) {
 
 		address := host.wm_client_search(host.grab_window)
 		clt := &host.client[address]
 
-		if clt.config_wait > 0 {
-			clt.config_wait--
-			return
-		}
-		clt.config_wait = host.config.max_config_wait
 
 		xdiff := int(xmotion.x_root) - host.grab_root_x
 		ydiff := int(xmotion.y_root) - host.grab_root_y

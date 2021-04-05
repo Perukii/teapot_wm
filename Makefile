@@ -5,7 +5,7 @@ all:
 	go build -o wm ./src
 
 init_xinitrc:
-	echo "xcompmgr & ${CURDIR}/wm & xterm & . ${CURDIR}/startup.sh" > $(XINITRC)
+	echo "xcompmgr & ${CURDIR}/wm & xterm" > $(XINITRC)
 
 init_log_file:
 	echo "" > ./wmlog.txt

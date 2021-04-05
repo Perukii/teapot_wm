@@ -16,6 +16,10 @@ type WmClient struct{
 	reverse_y int
 	reverse_w int
 	reverse_h int
+	latest_x int
+	latest_y int
+	latest_w int
+	latest_h int
 
 	config_wait float64
 
