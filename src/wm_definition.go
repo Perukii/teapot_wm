@@ -32,11 +32,12 @@ type WmTransparent struct{
 	drawtype int
 }
 
-type WmConfig struct{
+type WmSetting struct{
 	client_border_overall_width int
 	client_border_shadow_width int
 	client_button_width int
 	client_button_margin_width int
+	client_text_margin_width int
 	max_config_wait float64
 }
 
@@ -73,7 +74,7 @@ type WmHost struct{
 
 	client []WmClient
 
-	config WmConfig
+	setting WmSetting
 }
 
 type WmGeometry struct {

@@ -16,6 +16,7 @@ void rectangle_shadow(cairo_t* ctx, int x, int y, int w, int h,
 void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
                                     int button_margin_width, int mask_button,
+                                    int text_margin_width,
                                     char* title, int n_title, int window_maximized){
     cairo_t* ctx = cairo_create(surface);
     cairo_set_operator(ctx, CAIRO_OPERATOR_CLEAR);
@@ -136,15 +137,15 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
     cairo_text_extents(ctx, title, &extents);
 
     double textbox_x = border_width;
-    double textbox_y = border_width - button_width - button_margin_width;
-    double textbox_w = extents.width + button_margin_width*2;
-    double textbox_h = button_width + button_margin_width;
+    double textbox_y = border_width - button_width - text_margin_width;
+    double textbox_w = extents.width + text_margin_width*2;
+    double textbox_h = button_width + text_margin_width;
     double textbox_ex_limit = w - border_width - button_margin_width - (button_width+button_margin_width)*3;
 
     if(textbox_x + textbox_w > textbox_ex_limit){
         textbox_w = textbox_ex_limit - textbox_x;
         int i = n_title-1;
-        while(i >= 0 && textbox_w < extents.width + button_margin_width*2){
+        while(i >= 0 && textbox_w < extents.width + text_margin_width*2){
             title[i] = ' ';
             i--;
             cairo_text_extents(ctx, title, &extents);
@@ -157,7 +158,7 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
                             textbox_y,
                             textbox_w,
                             textbox_h,
-                            button_margin_width,
+                            text_margin_width,
                             shadow_roughness);
     }
 
@@ -165,11 +166,8 @@ void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
     cairo_set_source(ctx, pattern_l[0]);
     cairo_fill(ctx);
     
-    cairo_move_to(ctx, textbox_x + button_margin_width, textbox_y + textbox_h - button_margin_width);
+    cairo_move_to(ctx, textbox_x + text_margin_width, textbox_y + textbox_h - text_margin_width);
     cairo_set_source_rgb(ctx, 0.9, 0.9, 0.9);
     cairo_show_text(ctx, title);  
-    
-
-
 }
 

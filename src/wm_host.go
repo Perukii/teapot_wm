@@ -77,7 +77,7 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 func (host *WmHost) wm_host_draw_client(address WmClientAddress){
 	clt := host.client[address]
 	wm_x11_draw_box(host.display, clt.mask,
-			host.config, host.mask_button, clt.title,
+			host.setting, host.mask_button, clt.title,
 			clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE)
 }
 
@@ -139,7 +139,7 @@ func (host *WmHost) wm_host_intern_atom(name string) XAtom{
 
 func (host *WmHost) wm_host_update_grab_mode(point_x int, point_y int, mask_x int, mask_y int, mask_w int, mask_h int){
 
-	resize_area_width := host.config.client_border_shadow_width
+	resize_area_width := host.setting.client_border_shadow_width
 
 	grab_rx := point_x-mask_x
 	grab_ry := point_y-mask_y
@@ -170,9 +170,9 @@ func (host *WmHost) wm_host_update_button_mode(point_x int, point_y int, mask_x 
 
 	host.mask_button = WM_BUTTON_NONE
 
-	border_width := host.config.client_border_overall_width
-	button_width := host.config.client_button_width
-	button_margin_width := host.config.client_button_margin_width
+	border_width := host.setting.client_border_overall_width
+	button_width := host.setting.client_button_width
+	button_margin_width := host.setting.client_button_margin_width
 
 	for i := 1; i <= 3; i++ {
         

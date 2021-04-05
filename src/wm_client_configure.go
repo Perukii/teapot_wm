@@ -17,7 +17,7 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 		return
 	}
 
-	clt.config_wait = host.config.max_config_wait
+	clt.config_wait = host.setting.max_config_wait
 
 	mask_x, mask_y, mask_w, mask_h := host.wm_client_get_mask_geometry_from_app(x, y, w, h)
 
@@ -76,8 +76,8 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	
 	{
 		rattr := host.wm_host_get_window_attributes(host.root_window)
-		border_width := host.config.client_border_overall_width
-		shadow_width := host.config.client_border_shadow_width
+		border_width := host.setting.client_border_overall_width
+		shadow_width := host.setting.client_border_shadow_width
 		
 		bs_diff := border_width-shadow_width
 
