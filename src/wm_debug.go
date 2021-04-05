@@ -21,3 +21,4 @@ func wm_debug_log_file_init(log_file *os.File){
 }
 
 var wm_debug_log = log.Println
+var wm_debug_error = log.Fatalln

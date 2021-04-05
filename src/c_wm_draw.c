@@ -13,7 +13,19 @@ void rectangle_shadow(cairo_t* ctx, int x, int y, int w, int h,
     }
 }
 
-void c_wm_transparent_draw_type_box(cairo_surface_t* surface, int w, int h,
+void c_wm_transparent_draw_background(cairo_surface_t* surface, char* file, int w, int h){
+    cairo_t* ctx = cairo_create(surface);
+    cairo_surface_t* img = cairo_image_surface_create_from_png(file);
+    int img_w = cairo_image_surface_get_width(img);
+    int img_h = cairo_image_surface_get_height(img);
+    cairo_save(ctx);
+    cairo_scale(ctx, (double)w/(double)img_w, (double)h/(double)img_h);
+    cairo_set_source_surface(ctx, img, 0, 0);
+    cairo_paint(ctx);
+    cairo_restore(ctx);
+}
+
+void c_wm_transparent_draw_box(cairo_surface_t* surface, int w, int h,
                                     int border_width, int shadow_width, int button_width,
                                     int button_margin_width, int mask_button,
                                     int text_margin_width,

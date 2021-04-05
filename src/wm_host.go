@@ -77,8 +77,12 @@ func (host *WmHost) wm_host_unmap_window(window XWindowID){
 func (host *WmHost) wm_host_draw_client(address WmClientAddress){
 	clt := host.client[address]
 	wm_x11_draw_box(host.display, clt.mask,
-			host.setting, host.mask_button, clt.title,
+			&host.setting, host.mask_button, clt.title,
 			clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE)
+}
+
+func (host *WmHost) wm_host_draw_background(w int, h int){
+	wm_x11_draw_background(host.background, &host.setting, w, h)
 }
 
 func (host *WmHost) wm_host_reparent_window(window XWindowID, parent XWindowID, x int, y int){

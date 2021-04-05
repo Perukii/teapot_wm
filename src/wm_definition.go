@@ -39,9 +39,16 @@ type WmSetting struct{
 	client_button_margin_width int
 	client_text_margin_width int
 	max_resize_process_wait float64
+
+	background_file string
 }
 
 type WmJsonSetting struct{
+	UserSetting WmJsonProperties `json:"UserSetting"`
+}
+
+type WmJsonProperties struct {
+	BackgroundPngFilePath string `json:"BackgroundPngFilePath"`
 }
 
 type WmHost struct{
@@ -79,11 +86,9 @@ type WmHost struct{
 
 	setting WmSetting
 	json_setting WmJsonSetting
+	
+	background WmTransparent
 
-}
-
-type WmGeometry struct {
-	x, y, w, h int
 }
 
 type WmWindowRelation struct{

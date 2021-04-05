@@ -223,7 +223,7 @@ func wm_x11_create_transparent_window(display *XDisplay, parent XWindowID,
 }
 
 func wm_x11_draw_box(display *XDisplay, transparent WmTransparent,
-					setting WmSetting, mask_button int, title string, maximized bool){
+					setting *WmSetting, mask_button int, title string, maximized bool){
 
 	attr := wm_x11_get_window_attributes(display, transparent.window)
 	surface_w := attr.width
@@ -232,7 +232,7 @@ func wm_x11_draw_box(display *XDisplay, transparent WmTransparent,
 	var maximized_val int = 0
 	if maximized { maximized_val = 1 }
 
-	C.c_wm_transparent_draw_type_box(transparent.surface, surface_w, surface_h,
+	C.c_wm_transparent_draw_box(transparent.surface, surface_w, surface_h,
 										C.int(setting.client_border_overall_width),
 										C.int(setting.client_border_shadow_width),
 										C.int(setting.client_button_width),
@@ -242,6 +242,11 @@ func wm_x11_draw_box(display *XDisplay, transparent WmTransparent,
 										C.CString(title),
 										C.int(len(title)),
 										C.int(maximized_val))
+}
+
+func wm_x11_draw_background(transparent WmTransparent, setting *WmSetting, w int, h int){
+	C.c_wm_transparent_draw_background(transparent.surface,
+										C.CString(setting.background_file), C.int(w), C.int(h))
 }
 
 func wm_x11_define_cursor(display *XDisplay, window XWindowID, cursor int){

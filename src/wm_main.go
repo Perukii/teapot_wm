@@ -8,10 +8,11 @@ func main(){
 
 func (host *WmHost) wm_main_run(){
 	host.wm_host_init()
-	host.wm_json_read()
-
 	host.wm_host_init_log_file()
 	defer host.wm_host_close_log_file()
+
+	host.wm_json_read()
+	host.wm_json_apply_user_setting()
 
 	host.wm_host_select_input(host.root_window,
 		XSubstructureNotifyMask |
@@ -31,5 +32,6 @@ func (host *WmHost) wm_main_run(){
 	host.setting.client_text_margin_width = 5
 	host.setting.max_resize_process_wait = 1.5
 
+	host.wm_background_map()
 	host.wm_host_run()
 }
