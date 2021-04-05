@@ -19,13 +19,7 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 
 	clt.config_wait = host.config.max_config_wait
 
-	border_width := host.config.client_drawable_range_border_width
-	
-	
-	mask_x := x - border_width
-	mask_y := y - border_width
-	mask_w := w + border_width*2
-	mask_h := h + border_width*2
+	mask_x, mask_y, mask_w, mask_h := host.wm_client_get_mask_geometry_from_app(x, y, w, h)
 
 	if resize_needed && move_needed {
 		host.wm_host_move_resize_window(clt.app, x, y, w, h)
@@ -82,8 +76,8 @@ func (host *WmHost) wm_client_set_maximize(address WmClientAddress, left int, ri
 	
 	{
 		rattr := host.wm_host_get_window_attributes(host.root_window)
-		border_width := host.config.client_drawable_range_border_width
-		shadow_width := host.config.client_grab_area_resize_width
+		border_width := host.config.client_border_overall_width
+		shadow_width := host.config.client_border_shadow_width
 		
 		bs_diff := border_width-shadow_width
 

@@ -90,8 +90,8 @@ func (host *WmHost) wm_event_loop_button_press(){
 	if clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_RIGHT &&
 	   clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NEUTRAL_LEFT { return }
 
-	border_width := host.config.client_drawable_range_border_width
-	shadow_width := host.config.client_grab_area_resize_width
+	border_width := host.config.client_border_overall_width
+	shadow_width := host.config.client_border_shadow_width
 	bs_diff := border_width-shadow_width
 	   
 	for i := len(host.client)-1; i > 0; i-- {
@@ -174,7 +174,7 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 			if clt.maximize_mode != WM_CLIENT_MAXIMIZE_MODE_NORMAL {
 				host.wm_client_app_reverse_size(address)
 				app_reverse_w_before := clt.app_reverse_w
-				border_width := host.config.client_drawable_range_border_width
+				border_width := host.config.client_border_overall_width
 				attr := host.wm_host_get_window_attributes(clt.app)
 				host.grab_x = int(xmotion.x)-app_reverse_w_before/2+border_width
 				host.grab_y = int(xmotion.y)
@@ -219,8 +219,8 @@ func (host *WmHost) wm_event_loop_motion_notify(){
 
 		if host.grab_comp_right + host.grab_comp_left > 0 {
 			rattr := host.wm_host_get_window_attributes(host.root_window)
-			border_width := host.config.client_drawable_range_border_width
-			shadow_width := host.config.client_grab_area_resize_width
+			border_width := host.config.client_border_overall_width
+			shadow_width := host.config.client_border_shadow_width
 			bs_diff := border_width-shadow_width
 
 			comp_w := int(rattr.width)-expw-bs_diff*4

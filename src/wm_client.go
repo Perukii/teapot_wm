@@ -28,10 +28,9 @@ func (host *WmHost) wm_client_setup(address WmClientAddress, xapp XWindowID){
 
 	attr := host.wm_host_get_window_attributes(clt.app)
 
-	border_width := host.config.client_drawable_range_border_width
+	border_width := host.config.client_border_overall_width
 
 	// ---Mask---
-	clt.mask.drawtype = WM_DRAW_TYPE_BOX
 	host.wm_host_setup_transparent(&clt.mask, host.root_window,
 								   int(attr.x)-border_width,
 								   int(attr.y)-border_width,
@@ -71,3 +70,29 @@ func (host *WmHost) wm_client_raise_app(address WmClientAddress){
 	
 }
 
+func (host *WmHost) wm_client_get_mask_geometry_from_app(x int, y int, w int, h int) (int,int,int,int) {
+	
+	border_width := host.config.client_border_overall_width
+	mask_x := x - border_width
+	mask_y := y - border_width
+	mask_w := w + border_width*2
+	mask_h := h + border_width*2
+	return mask_x, mask_y, mask_w, mask_h
+
+	// example
+	// mask_x, mask_y, mask_w, mask_h := host.wm_client_get_mask_geometry_from_app(x, y, w, h)
+}
+
+
+func (host *WmHost) wm_client_get_app_geometry_from_mask(x int, y int, w int, h int) (int,int,int,int) {
+	
+	border_width := host.config.client_border_overall_width
+	app_x := x + border_width
+	app_y := y + border_width
+	app_w := w - border_width*2
+	app_h := h - border_width*2
+	return app_x, app_y, app_w, app_h
+
+	// example
+	// app_x, app_y, app_w, app_h := host.wm_client_get_mask_geometry_from_app(x, y, w, h)
+}

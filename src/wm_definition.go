@@ -33,8 +33,8 @@ type WmTransparent struct{
 }
 
 type WmConfig struct{
-	client_drawable_range_border_width int
-	client_grab_area_resize_width int
+	client_border_overall_width int
+	client_border_shadow_width int
 	client_button_width int
 	client_button_margin_width int
 	max_config_wait float64
@@ -88,10 +88,6 @@ type WmWindowRelation struct{
 }
 
 const(
-	WM_DRAW_TYPE_NONE = 0
-	WM_DRAW_TYPE_BOX = 1
-	WM_DRAW_TYPE_MASK = 2
-
 	WM_RESIZE_MODE_NONE = 0
 	WM_RESIZE_MODE_TOP = 1
 	WM_RESIZE_MODE_BOTTOM = 2
