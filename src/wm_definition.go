@@ -21,7 +21,7 @@ type WmClient struct{
 	app_latest_w int
 	app_latest_h int
 
-	config_wait float64
+	resize_process_wait float64
 
 	title string
 }
@@ -38,7 +38,10 @@ type WmSetting struct{
 	client_button_width int
 	client_button_margin_width int
 	client_text_margin_width int
-	max_config_wait float64
+	max_resize_process_wait float64
+}
+
+type WmJsonSetting struct{
 }
 
 type WmHost struct{
@@ -75,6 +78,8 @@ type WmHost struct{
 	client []WmClient
 
 	setting WmSetting
+	json_setting WmJsonSetting
+
 }
 
 type WmGeometry struct {

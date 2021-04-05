@@ -12,12 +12,12 @@ func (host *WmHost) wm_client_configure(address WmClientAddress,
 		return
 	}
 
-	if clt.config_wait > 0 && resize_needed && from_motion{
-		clt.config_wait--
+	if clt.resize_process_wait > 0 && resize_needed && from_motion{
+		clt.resize_process_wait--
 		return
 	}
 
-	clt.config_wait = host.setting.max_config_wait
+	clt.resize_process_wait = host.setting.max_resize_process_wait
 
 	mask_x, mask_y, mask_w, mask_h := host.wm_client_get_mask_geometry_from_app(x, y, w, h)
 
