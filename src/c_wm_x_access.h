@@ -1,4 +1,8 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <cairo/cairo-xlib.h>
+#include <X11/cursorfont.h>
+#include <stdlib.h>
 
 int c_wm_x11_get_type_of_event(XEvent);
 Window c_wm_x11_query_window_from_array(Window*, int);

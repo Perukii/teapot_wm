@@ -10,7 +10,7 @@ import (
 func (host *WmHost) wm_json_read(){
 	if len(os.Args) <= 1 { return }
 
-	wm_debug_log(os.Args[1])
+	//wm_debug_log(os.Args[1])
 	data, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
 		wm_debug_log("Failed to load Setting file.")

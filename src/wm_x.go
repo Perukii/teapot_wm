@@ -3,12 +3,6 @@ package main
 
 /*
 #cgo pkg-config: x11 cairo
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <cairo/cairo-xlib.h>
-#include <X11/cursorfont.h>
-#include <stdlib.h>
-#include "./c_wm_draw.h"
 #include "./c_wm_x_access.h"
 */
 import "C"

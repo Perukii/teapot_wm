@@ -2,13 +2,6 @@
 package main
 
 /*
-#cgo pkg-config: x11 cairo
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <cairo/cairo-xlib.h>
-#include <X11/cursorfont.h>
-#include <stdlib.h>
-#include "./c_wm_draw.h"
 #include "./c_wm_x_access.h"
 */
 import "C"
@@ -298,30 +291,3 @@ func (host *WmHost) wm_host_run(){
 	}
 }
 
-
-
-func (host *WmHost) wm_host_draw_client(address WmClientAddress){
-	clt := host.client[address]
-	attr := host.wm_host_get_window_attributes(clt.mask.window)
-	surface_w := attr.width
-	surface_h := attr.height
-
-	var maximized_val int = 0
-	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE { maximized_val = 1 }
-
-	C.c_wm_transparent_draw_box(clt.mask.surface, surface_w, surface_h,
-				C.int(host.setting.client_border_overall_width),
-				C.int(host.setting.client_border_shadow_width),
-				C.int(host.setting.client_button_width),
-				C.int(host.setting.client_button_margin_width),
-				C.int(host.mask_button),
-				C.int(host.setting.client_text_margin_width),
-				C.CString(clt.title),
-				C.int(len(clt.title)),
-				C.int(maximized_val))
-}
-
-func (host *WmHost) wm_host_draw_background(w int, h int){
-	C.c_wm_transparent_draw_background(host.background.surface,
-		C.CString(host.setting.background_file), C.int(w), C.int(h))
-}
