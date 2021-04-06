@@ -40,7 +40,7 @@ func (host *WmHost) wm_host_move_resize_window(window XWindowID, x int, y int, w
 	C.XMoveResizeWindow(host.display, window, C.int(x), C.int(y), C.uint(w), C.uint(h))
 }
 
-func (host *WmHost) wm_host_resize_surface(surface *CairoSfc, w int, h int){
+func (host *WmHost) wm_host_resize_surface(surface *CairoSurface, w int, h int){
 	if w < 1 { w = 1 }
 	if h < 1 { h = 1 }
     C.cairo_xlib_surface_set_size(surface, C.int(w), C.int(h))

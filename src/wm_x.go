@@ -29,8 +29,8 @@ type (
 
 	XAtom = C.Atom
 
-	CairoSfc = C.cairo_surface_t
-	CairoCtx = C.cairo_t
+	CairoSurface = C.cairo_surface_t
+	CairoContext = C.cairo_t
 
 	CLong = C.long
 )

@@ -28,7 +28,7 @@ type WmClient struct{
 
 type WmTransparent struct{
 	window 	XWindowID
-	surface *CairoSfc
+	surface *CairoSurface
 	drawtype int
 }
 

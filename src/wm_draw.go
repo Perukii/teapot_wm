@@ -9,24 +9,7 @@ import "github.com/ungerik/go-cairo"
 import "unsafe"
 
 func (host *WmHost) wm_host_draw_client(address WmClientAddress){
-	/*
-	clt := host.client[address]
 
-
-	var maximized_val int = 0
-	if clt.maximize_mode == WM_CLIENT_MAXIMIZE_MODE_REVERSE { maximized_val = 1 }
-
-	C.c_wm_transparent_draw_box(clt.mask.surface, surface_w, surface_h,
-				C.int(host.setting.client_border_overall_width),
-				C.int(host.setting.client_border_shadow_width),
-				C.int(host.setting.client_button_width),
-				C.int(host.setting.client_button_margin_width),
-				C.int(host.mask_button),
-				C.int(host.setting.client_text_margin_width),
-				C.CString(clt.title),
-				C.int(len(clt.title)),
-				C.int(maximized_val))
-	*/
 	clt := host.client[address]
 	cr := clt.mask.surface.wm_cairo_create_go_surface()
 	
@@ -212,11 +195,11 @@ func (host *WmHost) wm_host_draw_background(w int, h int){
 	cr.Restore()
 }
 
-func (surface *CairoSfc) wm_cairo_create_context() *CairoCtx{
+func (surface *CairoSurface) wm_cairo_create_context() *CairoContext{
 	return C.cairo_create(surface)
 }
 
-func (surface *CairoSfc) wm_cairo_create_go_surface() *cairo.Surface{
+func (surface *CairoSurface) wm_cairo_create_go_surface() *cairo.Surface{
 	raw_sfc := (*C.cairo_surface_t)(surface)
 	raw_ctx := (*C.cairo_t)(surface.wm_cairo_create_context())
 	return cairo.NewSurfaceFromC(
